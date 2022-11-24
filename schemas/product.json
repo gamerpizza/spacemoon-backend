@@ -1,0 +1,1 @@
+{"productId":{"type":"integer"},"categoryId":{"type":"integer"},"name":{"type":"string"},"price":{"type":"number"},"rating":{"type":"integer"},"image":{"type":"string"},"description":{"type":"string"},"createdBy":{"type":"string"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"}}

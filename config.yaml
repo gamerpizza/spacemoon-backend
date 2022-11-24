@@ -1,0 +1,38 @@
+server:
+  host: localhost
+  port: 8000
+  persistence:
+    type: mongo
+    database: spacemoon
+    url: mongodb://localhost:27017
+    # type: postgres
+    # url: host=localhost user=admin password=admin dbname=spacemoon port=5432 sslmode=disable
+    # database: spacemoon
+  security:
+    oauth:
+      realm: spacemoon
+      clientId: spacemoon-backend
+      url: http://localhost:8080
+      adminCredentials:
+        username: admin
+        password: admin
+        realm: master
+    cors:
+      allow-origins:
+        - "*"
+      allow-methods:
+        - "*"
+      allow-headers:
+        - "*"
+      expose-headers:
+        - "*"
+  payment:
+    paypal:
+      url: https://api-m.sandbox.paypal.com
+      clientId: AYwWVz66P0d9VCM81URY1ZQhUWt5jQUXOGt4QqAxYAhahIW_uFH0DlmBDyoZg7KnXCUJSy7jrIz3CS5n
+      clientSecret: EH44NTBiE6t1uPT0qStLqenNbFChtuZ-2p0RglYYIeQbO-az1HrBkeK-NPRw1RYkIJOCwQBCYdEBJY9K
+    stripe:
+      publicKey: pk_test_51LvTnkB3vjqTPErBoEbfQJ1UOGsVgrjGMBtdViYCq7ral1GA7NLibdQU1pAlzXbq57LJwtWb9ZcAW7PZL3pik2ef001JyyEBDZ
+      apiKey: sk_test_51LvTnkB3vjqTPErByu0QYEcvx636oQ9NtrVYEVGNRIw9Gz5iYB0WcuTTtjQiddkwVpg3f343PqfYrAKHq7NydpER00WuERbqaM
+      cancelUrl: "http://localhost:3000/stripe-cancel"
+      successUrl: "http://localhost:3000/stripe-success"
