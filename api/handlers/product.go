@@ -28,9 +28,9 @@ func DeleteProduct(s service.Product) gin.HandlerFunc {
 	}
 }
 
-func UpdateProduct(s service.Product) gin.HandlerFunc {
+func UpdateProduct(s service.Product, serverUrl string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		updateProduct(ctx, s)
+		updateProduct(ctx, serverUrl, s)
 	}
 }
 
@@ -77,20 +77,32 @@ func createProduct(ctx *gin.Context, s service.Product, serverUrl string, ce uti
 	ctx.JSON(200, "OK")
 }
 
-func updateProduct(ctx *gin.Context, s service.Product) {
-	p := model.Product{}
-	err := utils.DecodeRequestBody(ctx.Request.Body, &p)
+func updateProduct(ctx *gin.Context, serverUrl string, s service.Product) {
+	p := dto.ProductDto{}
+	err := ctx.Bind(&p)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
-	cid := ctx.Param("categoryId")
-	pid := ctx.Param("productId")
-	p.CategoryID = cid
-	p.ID = pid
-	err = s.Update(p)
+	imgPath, err := utils.SaveImage(ctx, p.Image)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	prod := model.Product{}
+	cid := ctx.Param("categoryId")
+	pid := ctx.Param("productId")
+	prod.Name = p.Name
+	prod.Image = serverUrl + "/" + imgPath
+	prod.CategoryID = cid
+	prod.Price = p.Price
+	prod.Description = p.Description
+	err = s.Update(pid, prod)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
 	ctx.JSON(200, "OK")

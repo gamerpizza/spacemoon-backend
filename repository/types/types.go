@@ -16,7 +16,7 @@ type Repository[T model.Entity] interface {
 	Update(c context.Context, id string, data T) error
 	GetProductLimit(c context.Context, cid string, start, end uint64, result *[]T) error
 	DeleteProduct(c context.Context, cid string, data T) error
-	UpdateProduct(c context.Context, cid string, data T) error
+	UpdateProduct(c context.Context, cid string, id string, data T) error
 }
 
 type ProductAssociation interface {

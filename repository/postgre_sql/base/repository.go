@@ -77,7 +77,7 @@ func (pr *BaseRepositoryImpl[T]) DeleteProduct(c context.Context, cid string, da
 	return nil
 }
 
-func (pr *BaseRepositoryImpl[T]) UpdateProduct(c context.Context, cid string, data T) error {
+func (pr *BaseRepositoryImpl[T]) UpdateProduct(c context.Context, cid string, id string, data T) error {
 	// NOOP For now
 	return nil
 }

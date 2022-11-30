@@ -3,7 +3,6 @@ package base
 import (
 	"context"
 	"errors"
-	"fmt"
 	"moonspace/model"
 	"moonspace/repository/mongo/types"
 
@@ -88,7 +87,7 @@ func (pr *BaseRepositoryImpl[T]) GetProductLimit(c context.Context, cid string, 
 		return err
 	}
 
-	entityQuery := bson.M{"product.category_id": cid}
+	entityQuery := bson.M{"category_id": cid}
 
 	return col.Find(c, entityQuery).Skip(int64(start)).Limit(int64(end - start)).All(result)
 }
@@ -99,19 +98,19 @@ func (pr *BaseRepositoryImpl[T]) DeleteProduct(c context.Context, cid string, da
 		return err
 	}
 	entityQuery := (bson.M)(data.Key())
-	entityQuery["product.category_id"] = cid
+	entityQuery["category_id"] = cid
 	return col.Remove(c, entityQuery)
 }
 
-func (pr *BaseRepositoryImpl[T]) UpdateProduct(c context.Context, cid string, data T) error {
+func (pr *BaseRepositoryImpl[T]) UpdateProduct(c context.Context, cid string, id string, data T) error {
 	col, err := pr.SwitchTable(&data)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(data.Key())
-	entityQuery := (bson.M)(data.Key())
-	entityQuery["products.categoryId"] = cid
+	oid, _ := primitive.ObjectIDFromHex(id)
+	entityQuery := bson.M{"_id": oid}
+	entityQuery["category_id"] = cid
 
 	_, err = col.Upsert(c, entityQuery, data)
 	if err != nil {

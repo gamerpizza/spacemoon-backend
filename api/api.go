@@ -101,7 +101,7 @@ func (a *API) setupSecureRoutes(router *gin.Engine, service service.Service) *gi
 	productRouter := apiRouter.Group(product)
 	productRouter.POST(createProduct, handlers.CreateProduct(service.Product, url, &extractor))
 	productRouter.DELETE(deleteProduct, handlers.DeleteProduct(service.Product))
-	productRouter.PUT(updateProduct, handlers.UpdateProduct(service.Product))
+	productRouter.PUT(updateProduct, handlers.UpdateProduct(service.Product, url))
 	productRouter.GET(getProduct, handlers.GetProduct(service.Product))
 	productRouter.GET(paginateProducts, handlers.GetProductsLimit(service.Product))
 

@@ -7,7 +7,7 @@ import (
 )
 
 type Product struct {
-	ID          string    `bson:"_id" json:"productId" gorm:"column:product_id" gorm:"primaryKey"`
+	ID          string    `bson:"_id,omitempty" json:"productId" gorm:"column:product_id" gorm:"primaryKey" gorm:"unique"`
 	CategoryID  string    `bson:"category_id" json:"categoryId" gorm:"foreignKey:category_id"`
 	Name        string    `bson:"name" json:"name"  gorm:"index"`
 	Price       float64   `bson:"price" json:"price"   gorm:"index"`
@@ -23,6 +23,6 @@ type Product struct {
 func (p Product) Key() map[string]interface{} {
 	id, _ := primitive.ObjectIDFromHex(p.ID)
 	return map[string]interface{}{
-		"_id": id.Hex(),
+		"_id": id,
 	}
 }

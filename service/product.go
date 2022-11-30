@@ -12,7 +12,7 @@ type Product interface {
 	Create(p model.Product) error
 	Get(pid string) (model.Product, error)
 	GetProductsLimit(cid string, start, end uint64) ([]model.Product, error)
-	Update(p model.Product) error
+	Update(pid string, p model.Product) error
 	Delete(cid, pid string) error
 }
 
@@ -59,13 +59,13 @@ func (s *productImpl) GetProductsLimit(cid string, start, end uint64) ([]model.P
 	return p, nil
 }
 
-func (s *productImpl) Update(p model.Product) error {
+func (s *productImpl) Update(pid string, p model.Product) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	p.UpdatedAt = time.Now()
 
-	return s.productRepo.UpdateProduct(ctx, p.CategoryID, p)
+	return s.productRepo.UpdateProduct(ctx, p.CategoryID, pid, p)
 }
 
 func (s *productImpl) Delete(cid, pid string) error {
