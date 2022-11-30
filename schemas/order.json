@@ -1,1 +1,0 @@
-{"orderId":{"type":"string"},"cart":{"$ref":"#/$defs/Cart"},"createdBy":{"type":"string"},"status":{"type":"integer"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"}}
