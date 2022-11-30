@@ -13,7 +13,7 @@ type Category interface {
 	Delete(cid string) error
 	Get(cid string) (model.Category, error)
 	GetLimit(start, end uint64) ([]model.Category, error)
-	Update(cat model.Category) error
+	Update(cid string, cat model.Category) error
 }
 
 type categoryImpl struct {
@@ -61,12 +61,12 @@ func (c *categoryImpl) GetLimit(start, end uint64) ([]model.Category, error) {
 	return cats, nil
 }
 
-func (c *categoryImpl) Update(cat model.Category) error {
+func (c *categoryImpl) Update(cid string, cat model.Category) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	cat.UpdatedAt = time.Now()
 
-	return c.categoryRepo.Update(ctx, cat)
+	return c.categoryRepo.Update(ctx, cid, cat)
 }
 
 func (c *categoryImpl) Delete(cid string) error {

@@ -94,7 +94,7 @@ func (a *API) setupSecureRoutes(router *gin.Engine, service service.Service) *gi
 	categoryRouter := apiRouter.Group(category)
 	categoryRouter.POST(createCategory, handlers.CreateCategory(service.Category, url, &extractor))
 	categoryRouter.DELETE(deleteCategory, handlers.DeleteCategory(service.Category))
-	categoryRouter.PUT(updateCategory, handlers.UpdateCategory(service.Category))
+	categoryRouter.PUT(updateCategory, handlers.UpdateCategory(service.Category, url))
 	categoryRouter.GET(getCategory, handlers.GetCategory(service.Category))
 	categoryRouter.GET(paginateCategories, handlers.GetCategoryLimit(service.Category))
 

@@ -24,7 +24,7 @@ func CreateProduct(s service.Product, serverUrl string, ce utils.ClaimsExtractor
 
 func DeleteProduct(s service.Product) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		getDeleteProduct(ctx, s)
+		deleteProduct(ctx, s)
 	}
 }
 
@@ -36,13 +36,13 @@ func UpdateProduct(s service.Product) gin.HandlerFunc {
 
 func GetProduct(s service.Product) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		getDeleteProduct(ctx, s)
+		getProduct(ctx, s)
 	}
 }
 
 func GetProductsLimit(s service.Product) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		getLimitProducts(ctx, s)
+		getProductsLimit(ctx, s)
 	}
 }
 
@@ -55,7 +55,7 @@ func createProduct(ctx *gin.Context, s service.Product, serverUrl string, ce uti
 	}
 
 	p := dto.ProductDto{}
-	err = ctx.Bind(p)
+	err = ctx.Bind(&p)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -96,19 +96,24 @@ func updateProduct(ctx *gin.Context, s service.Product) {
 	ctx.JSON(200, "OK")
 }
 
-func getDeleteProduct(ctx *gin.Context, service service.Product) {
+func getProduct(ctx *gin.Context, s service.Product) {
+	id := ctx.Param("id")
+	cat, err := s.Get(id)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.JSON(200, cat)
+}
+
+func deleteProduct(ctx *gin.Context, s service.Product) {
 	cid := ctx.Param("categoryId")
 	pid := ctx.Param("productId")
 	var res any
 	var err error
-
-	if ctx.Request.Method == http.MethodGet {
-		res, err = service.Get(cid, pid)
-	} else if ctx.Request.Method == http.MethodDelete {
-		err = service.Delete(cid, pid)
-		res = "OK"
-	}
-
+	err = s.Delete(cid, pid)
+	res = "OK"
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -117,7 +122,7 @@ func getDeleteProduct(ctx *gin.Context, service service.Product) {
 	ctx.JSON(200, res)
 }
 
-func getLimitProducts(ctx *gin.Context, s service.Product) {
+func getProductsLimit(ctx *gin.Context, s service.Product) {
 	cid := ctx.Param("categoryId")
 	start, err := utils.StringToUint64(ctx.Param("start"))
 	if err != nil {
@@ -143,4 +148,5 @@ func getLimitProducts(ctx *gin.Context, s service.Product) {
 	}
 
 	ctx.JSON(200, res)
+
 }

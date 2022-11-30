@@ -12,7 +12,7 @@ server:
     oauth:
       realm: spacemoon
       clientId: spacemoon-backend
-      url: http://localhost:8080
+      url: http://localhost:8080/auth
       adminCredentials:
         username: admin
         password: admin
@@ -29,10 +29,10 @@ server:
   payment:
     paypal:
       url: https://api-m.sandbox.paypal.com
-      clientId: AYwWVz66P0d9VCM81URY1ZQhUWt5jQUXOGt4QqAxYAhahIW_uFH0DlmBDyoZg7KnXCUJSy7jrIz3CS5n
-      clientSecret: EH44NTBiE6t1uPT0qStLqenNbFChtuZ-2p0RglYYIeQbO-az1HrBkeK-NPRw1RYkIJOCwQBCYdEBJY9K
+      clientId: AfkQVKeSRVJUL5gpbLnM9QAGuRW4NI1Jj-SOemqayU6EvFR6QLAnBh6wULlf9q-XCf9kdr1az17m8aWX
+      clientSecret: EAOQbx9-jauX8nGUXiHeD10ypBU3Qnasd5lEeuchw_u7z-3hNvnfdF6JPJWe4npuG1lva3FNAyyu2P6f
     stripe:
-      publicKey: pk_test_51LvTnkB3vjqTPErBoEbfQJ1UOGsVgrjGMBtdViYCq7ral1GA7NLibdQU1pAlzXbq57LJwtWb9ZcAW7PZL3pik2ef001JyyEBDZ
-      apiKey: sk_test_51LvTnkB3vjqTPErByu0QYEcvx636oQ9NtrVYEVGNRIw9Gz5iYB0WcuTTtjQiddkwVpg3f343PqfYrAKHq7NydpER00WuERbqaM
+      publicKey: pk_test_51M9BVsCmylKw2kXGBy0OzXSYRsRbFL5nbbMKJJ4FOnBXlmc3Kz9GvJW2jPgSnIsSMLqJ4bLxjwNFQuORbZgtG22w00WaZmVePV
+      apiKey: sk_test_51M9BVsCmylKw2kXGQK8OUy00lH29NhK8cfWusn2w6Xqf4rXWqbl8xgrPWgZ8Y7DkTlqvlFOEY54WT5wFYnGlACOj00qaVT1w3x
       cancelUrl: "http://localhost:3000/stripe-cancel"
       successUrl: "http://localhost:3000/stripe-success"

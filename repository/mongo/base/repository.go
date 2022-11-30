@@ -9,6 +9,7 @@ import (
 
 	"github.com/qiniu/qmgo"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var errUnsupportedRepository = errors.New("cannot switch table; unknown data type")
@@ -65,14 +66,54 @@ func (pr *BaseRepositoryImpl[T]) Delete(c context.Context, data T) error {
 	return col.Remove(c, bson.M(data.Key()))
 }
 
-func (pr *BaseRepositoryImpl[T]) Update(c context.Context, data T) error {
+func (pr *BaseRepositoryImpl[T]) Update(c context.Context, id string, data T) error {
+	col, err := pr.SwitchTable(&data)
+	if err != nil {
+		return err
+	}
+
+	oid, _ := primitive.ObjectIDFromHex(id)
+	_, err = col.Upsert(c, bson.M{"_id": oid}, data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (pr *BaseRepositoryImpl[T]) GetProductLimit(c context.Context, cid string, start, end uint64, result *[]T) error {
+	var t T
+	col, err := pr.SwitchTable(&t)
+	if err != nil {
+		return err
+	}
+
+	entityQuery := bson.M{"product.category_id": cid}
+
+	return col.Find(c, entityQuery).Skip(int64(start)).Limit(int64(end - start)).All(result)
+}
+
+func (pr *BaseRepositoryImpl[T]) DeleteProduct(c context.Context, cid string, data T) error {
+	col, err := pr.SwitchTable(&data)
+	if err != nil {
+		return err
+	}
+	entityQuery := (bson.M)(data.Key())
+	entityQuery["product.category_id"] = cid
+	return col.Remove(c, entityQuery)
+}
+
+func (pr *BaseRepositoryImpl[T]) UpdateProduct(c context.Context, cid string, data T) error {
 	col, err := pr.SwitchTable(&data)
 	if err != nil {
 		return err
 	}
 
 	fmt.Println(data.Key())
-	_, err = col.Upsert(c, bson.M(data.Key()), data)
+	entityQuery := (bson.M)(data.Key())
+	entityQuery["products.categoryId"] = cid
+
+	_, err = col.Upsert(c, entityQuery, data)
 	if err != nil {
 		return err
 	}
