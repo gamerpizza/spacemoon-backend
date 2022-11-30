@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	http.Handle("/product", product.Handler{})
+	http.Handle("/product", &product.Handler{})
 }

@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fb7450d0-478b-4c8e-8345-f60a5124a900" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/product/product.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/product/product.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/product/product_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/product/product_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/spacemoon.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/spacemoon.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +52,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.go test spacemoon-backend">
+  <component name="RunManager" selected="Go Test.TestHandler_ServeHTTP_Get_OneProduct in spacemoon/server/product">
     <configuration name="TestHandler_Get in spacemoon/server/product" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="spacemoon-backend" />
       <working_directory value="$PROJECT_DIR$/server/product" />
@@ -63,6 +65,30 @@
       <pattern value="^\QTestHandler_Get\E$" />
       <method v="2" />
     </configuration>
+    <configuration name="TestHandler_ServeHTTP_Get_OneProduct in spacemoon/server/product" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="spacemoon-backend" />
+      <working_directory value="$PROJECT_DIR$/server/product" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="spacemoon/server/product" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestHandler_ServeHTTP_Get_OneProduct\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestHandler_ServeHTTP_Post in spacemoon/server/product" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="spacemoon-backend" />
+      <working_directory value="$PROJECT_DIR$/server/product" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="spacemoon/server/product" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestHandler_ServeHTTP_Post\E$" />
+      <method v="2" />
+    </configuration>
     <configuration name="go test spacemoon-backend" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="spacemoon-backend" />
       <working_directory value="$PROJECT_DIR$" />
@@ -73,8 +99,22 @@
       <framework value="gotest" />
       <method v="2" />
     </configuration>
+    <configuration name="go test spacemoon/server/product" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="spacemoon-backend" />
+      <working_directory value="$PROJECT_DIR$/server/product" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="spacemoon/server/product" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestHandler_ServeHTTP_Get_OneProduct in spacemoon/server/product" />
+        <item itemvalue="Go Test.go test spacemoon/server/product" />
+        <item itemvalue="Go Test.TestHandler_ServeHTTP_Post in spacemoon/server/product" />
         <item itemvalue="Go Test.go test spacemoon-backend" />
         <item itemvalue="Go Test.TestHandler_Get in spacemoon/server/product" />
       </list>
@@ -111,10 +151,15 @@
           <line>59</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/server/product/product_test.go</url>
+          <line>41</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/spacemoon_backend$go_test_spacemoon_backend.out" NAME="go test spacemoon-backend Coverage Results" MODIFIED="1669819717686" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="GoCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+    <SUITE FILE_PATH="coverage/spacemoon_backend$go_test_spacemoon_backend.out" NAME="go test spacemoon-backend Coverage Results" MODIFIED="1669821960766" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="GoCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>
