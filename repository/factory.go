@@ -20,14 +20,3 @@ func CreateRepository[T model.Entity](cli any, cfg types.Config) types.Repositor
 		panic("unsupported database type: " + cfg.Type)
 	}
 }
-
-func CreateProductRepository[T types.ProductAssociation](cli any, cfg types.Config) types.ProductAssociatedRepository[T] {
-	switch cfg.Type {
-	case types.Mongo:
-		return mongo_base.NewProductAssociatedRepository[T](cli.(*qmgo.QmgoClient), cfg.Database)
-	case types.Postgres:
-		return postgres_base.NewProductAssociatedRepository[T](cli.(*gorm.DB))
-	default:
-		panic("unsupported database type: " + cfg.Type)
-	}
-}

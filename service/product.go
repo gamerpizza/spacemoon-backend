@@ -6,92 +6,74 @@ import (
 	"moonspace/repository"
 	"moonspace/repository/types"
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Product interface {
 	Create(p model.Product) error
-	Get(cid, pid string) (model.Product, error)
+	Get(pid string) (model.Product, error)
 	GetProductsLimit(cid string, start, end uint64) ([]model.Product, error)
 	Update(p model.Product) error
 	Delete(cid, pid string) error
 }
 
 type productImpl struct {
-	categoryRepo types.ProductAssociatedRepository[model.Category]
+	productRepo types.Repository[model.Product]
 }
 
 func NewProductService(cli any, cfg types.Config) Product {
 	return &productImpl{
-		categoryRepo: repository.CreateProductRepository[model.Category](cli, cfg),
+		productRepo: repository.CreateRepository[model.Product](cli, cfg),
 	}
 }
 
 func (s *productImpl) Create(p model.Product) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	category := model.Category{
-		ID: p.CategoryID,
-	}
-	p.ID = primitive.NewObjectID().Hex()
 	p.CreatedAt = time.Now()
-
-	return s.categoryRepo.AddProduct(ctx, &category, &p)
+	return s.productRepo.Add(ctx, p)
 }
 
-func (s *productImpl) Get(cid, pid string) (model.Product, error) {
+func (s *productImpl) Get(pid string) (model.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	category := model.Category{
-		ID: cid,
-	}
-	prod := model.Product{}
+	p := model.Product{ID: pid}
 
-	err := s.categoryRepo.GetProduct(ctx, &category, pid, &prod)
+	err := s.productRepo.Get(ctx, p.Key(), &p)
 	if err != nil {
 		return model.Product{}, err
 	}
 
-	return prod, nil
+	return p, nil
 }
 
 func (s *productImpl) GetProductsLimit(cid string, start, end uint64) ([]model.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	category := model.Category{
-		ID: cid,
-	}
+	p := make([]model.Product, 0)
 
-	err := s.categoryRepo.GetProductsLimit(ctx, &category, start, end)
+	err := s.productRepo.GetProductLimit(ctx, cid, start, end, &p)
 	if err != nil {
 		return nil, err
 	}
 
-	return category.Products, nil
+	return p, nil
 }
 
 func (s *productImpl) Update(p model.Product) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	category := model.Category{
-		ID: p.CategoryID,
-	}
 
 	p.UpdatedAt = time.Now()
 
-	return s.categoryRepo.UpdateProduct(ctx, &category, &p)
+	return s.productRepo.UpdateProduct(ctx, p.CategoryID, p)
 }
 
 func (s *productImpl) Delete(cid, pid string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	category := model.Category{
-		ID: cid,
-	}
 	product := model.Product{
 		ID: pid,
 	}
 
-	return s.categoryRepo.DeleteProduct(ctx, &category, &product)
+	return s.productRepo.DeleteProduct(ctx, cid, product)
 }

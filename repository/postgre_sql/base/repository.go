@@ -56,7 +56,7 @@ func (pr *BaseRepositoryImpl[T]) Delete(c context.Context, data T) error {
 	return pr.cli.Where(query, val).Delete(&data).Error
 }
 
-func (pr *BaseRepositoryImpl[T]) Update(c context.Context, data T) error {
+func (pr *BaseRepositoryImpl[T]) Update(c context.Context, id string, data T) error {
 	query, val, err := createQuery(data)
 	if err != nil {
 		return err
@@ -65,6 +65,21 @@ func (pr *BaseRepositoryImpl[T]) Update(c context.Context, data T) error {
 	tx := pr.cli.Model(data).Where(query, val...).Updates(&data)
 
 	return tx.Error
+}
+
+func (pr *BaseRepositoryImpl[T]) GetProductLimit(c context.Context, cid string, start, end uint64, result *[]T) error {
+	// NOOP For now
+	return nil
+}
+
+func (pr *BaseRepositoryImpl[T]) DeleteProduct(c context.Context, cid string, data T) error {
+	// NOOP For now
+	return nil
+}
+
+func (pr *BaseRepositoryImpl[T]) UpdateProduct(c context.Context, cid string, data T) error {
+	// NOOP For now
+	return nil
 }
 
 func createQuery[T model.Entity](data T) (string, []interface{}, error) {

@@ -74,5 +74,5 @@ func (os *orderImpl) Checkout(oid string, userId model.UserID, paymentType payme
 	os.orderRepo.Get(ctx, order.Key(), &order)
 	order.Status = model.OrderStatusApprooved
 
-	return os.orderRepo.Update(ctx, order)
+	return os.orderRepo.Update(ctx, oid, order)
 }

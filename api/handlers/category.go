@@ -31,9 +31,9 @@ func GetCategoryLimit(s service.Category) gin.HandlerFunc {
 	}
 }
 
-func UpdateCategory(s service.Category) gin.HandlerFunc {
+func UpdateCategory(s service.Category, serverUrl string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		updateCategory(ctx, s)
+		updateCategory(ctx, serverUrl, s)
 	}
 }
 
@@ -111,11 +111,25 @@ func getCategoryLimit(ctx *gin.Context, s service.Category) {
 	ctx.JSON(200, cats)
 }
 
-func updateCategory(ctx *gin.Context, s service.Category) {
+func updateCategory(ctx *gin.Context, serverUrl string, s service.Category) {
+	c := dto.CategoryDto{}
+	err := ctx.Bind(&c)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	imgPath, err := utils.SaveImage(ctx, c.Image)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	cat := model.Category{}
 	id := ctx.Param("id")
-	cat.ID = id
-	err := s.Update(cat)
+	cat.Name = c.Name
+	cat.Image = serverUrl + "/" + imgPath
+	err = s.Update(id, cat)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
