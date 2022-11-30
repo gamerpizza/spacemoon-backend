@@ -1,9 +1,11 @@
 package product
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"spacemoon/product"
 	"testing"
 )
@@ -14,7 +16,15 @@ func TestHandler_Get(t *testing.T) {
 	fakeRequest := httptest.NewRequest(http.MethodGet, "/product", http.NoBody)
 	spy := spyWriter{}
 	testHandler.ServeHTTP(&spy, fakeRequest)
-	fmt.Printf("%s", spy.written)
+	var products product.Products = make(product.Products)
+	err := json.Unmarshal([]byte(spy.written), &products)
+	if err != nil {
+		t.Fatalf("could not unmarshal response: %s", err.Error())
+	}
+	if !reflect.DeepEqual(products, expectedProducts) {
+		t.Fatalf("retrieved products '%+v'\n"+
+			"do not match the expected products '%+v'\n", products, expectedProducts)
+	}
 }
 
 type spyWriter struct {
