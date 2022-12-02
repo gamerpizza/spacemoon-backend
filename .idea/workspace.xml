@@ -5,15 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fb7450d0-478b-4c8e-8345-f60a5124a900" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/server/product_handler/helpers.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/product_handler/product.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/product_handler/product_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/quote.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/product/product.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/product/product.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/product/product_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/product/product_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/product/product.go" beforeDir="false" afterPath="$PROJECT_DIR$/product/product.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/product/product.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/product/product_test.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/server/spacemoon.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/spacemoon.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
   </component>
   <component name="GOROOT" url="file:///usr/local/go" />
   <component name="Git.Settings">
@@ -28,41 +41,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.format.on.save.advertiser.fired&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/haris/GolandProjects/spacemoon-backend&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.format.on.save.advertiser.fired": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "go.import.settings.migrated": "true",
+    "go.sdk.automatically.set": "true",
+    "last_opened_file_path": "/home/haris/GolandProjects/spacemoon-backend",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestHandler_ServeHTTP_Get_OneProduct in spacemoon/server/product">
-    <configuration name="TestHandler_Get in spacemoon/server/product" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Build.go build spacemoon/server">
+    <configuration name="go build spacemoon/server" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="spacemoon-backend" />
-      <working_directory value="$PROJECT_DIR$/server/product" />
-      <root_directory value="$PROJECT_DIR$" />
+      <working_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="spacemoon/server/product" />
+      <package value="spacemoon/server" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestHandler_Get\E$" />
+      <filePath value="$PROJECT_DIR$/server/spacemoon.go" />
       <method v="2" />
     </configuration>
     <configuration name="TestHandler_ServeHTTP_Get_OneProduct in spacemoon/server/product" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -77,7 +88,7 @@
       <pattern value="^\QTestHandler_ServeHTTP_Get_OneProduct\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestHandler_ServeHTTP_Post in spacemoon/server/product" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestHandler_ServeHTTP_Post_Then_Get in spacemoon/server/product" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="spacemoon-backend" />
       <working_directory value="$PROJECT_DIR$/server/product" />
       <root_directory value="$PROJECT_DIR$" />
@@ -86,7 +97,7 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestHandler_ServeHTTP_Post\E$" />
+      <pattern value="^\QTestHandler_ServeHTTP_Post_Then_Get\E$" />
       <method v="2" />
     </configuration>
     <configuration name="go test spacemoon-backend" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -112,11 +123,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.TestHandler_ServeHTTP_Get_OneProduct in spacemoon/server/product" />
-        <item itemvalue="Go Test.go test spacemoon/server/product" />
-        <item itemvalue="Go Test.TestHandler_ServeHTTP_Post in spacemoon/server/product" />
+        <item itemvalue="Go Build.go build spacemoon/server" />
         <item itemvalue="Go Test.go test spacemoon-backend" />
-        <item itemvalue="Go Test.TestHandler_Get in spacemoon/server/product" />
+        <item itemvalue="Go Test.TestHandler_ServeHTTP_Post_Then_Get in spacemoon/server/product" />
+        <item itemvalue="Go Test.go test spacemoon/server/product" />
+        <item itemvalue="Go Test.TestHandler_ServeHTTP_Get_OneProduct in spacemoon/server/product" />
       </list>
     </recent_temporary>
   </component>
@@ -152,14 +163,14 @@
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/server/product/product_test.go</url>
-          <line>41</line>
-          <option name="timeStamp" value="5" />
+          <url>file://$PROJECT_DIR$/server/product_handler/product.go</url>
+          <line>97</line>
+          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/spacemoon_backend$go_test_spacemoon_backend.out" NAME="go test spacemoon-backend Coverage Results" MODIFIED="1669821960766" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="GoCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+    <SUITE FILE_PATH="coverage/spacemoon_backend$go_test_spacemoon_backend.out" NAME="go test spacemoon-backend Coverage Results" MODIFIED="1669934909714" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="GoCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>
