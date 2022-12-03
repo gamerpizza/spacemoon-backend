@@ -1,1 +1,0 @@
-{"categoryId":{"type":"integer"},"name":{"type":"string"},"image":{"type":"string"},"products":{"items":{"$ref":"#/$defs/Product"},"type":"array"},"createdBy":{"type":"string"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"}}
