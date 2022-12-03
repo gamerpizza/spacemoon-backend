@@ -24,8 +24,8 @@ type Category interface {
 }
 
 type DTO struct {
-	Name     Name
-	Products product.Products
+	Name     Name             `json:"name"`
+	Products product.Products `json:"products"`
 }
 
 func (d *DTO) DTO() DTO {
@@ -49,6 +49,11 @@ func (d *DTO) GetName() Name {
 	return d.Name
 }
 
+func (d *DTO) DeleteProduct(id product.Id) {
+	delete(d.Products, id)
+}
+
 type Name string
+type Categories map[Name]DTO
 
 var EmptyNameError = errors.New("category name cannot be empty")

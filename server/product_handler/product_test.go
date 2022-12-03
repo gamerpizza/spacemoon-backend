@@ -44,7 +44,7 @@ func TestHandler_ServeHTTP_Post_Then_Get(t *testing.T) {
 		t.Fatalf("could not unmarshal response: %s\n", err.Error())
 	}
 
-	fakeGetRequest := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/product?id=%s", postResponseProduct.GetId()), bytes.NewReader(productJson))
+	fakeGetRequest := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/product?id=%s", postResponseProduct.GetId()), http.NoBody)
 	getSpy := spyWriter{}
 	testHandler.ServeHTTP(&getSpy, fakeGetRequest)
 	if getSpy.header != http.StatusOK {
