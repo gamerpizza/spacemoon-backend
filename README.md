@@ -2,7 +2,10 @@
 An out-of-this-world online retail space 
 
 ## How to build
-Run `go build ./server/spacemoon.go` from the root directory to build the server.
+Run `go build ./server/spacemoon.go` from the root directory to build the server executable.
+Alternatively, you can just run the server without building the executable by running `go run ./server/spacemoon.go`
+
+Right now, it is using PORT 1234 to receive the requests.
 
 ---
 
