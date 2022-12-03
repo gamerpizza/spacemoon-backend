@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fb7450d0-478b-4c8e-8345-f60a5124a900" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/login/login.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/login/login_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,50 +61,41 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build spacemoon/server">
-    <configuration name="go build spacemoon/server" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Test.go test spacemoon-backend">
+    <configuration name="TestSecureHandler_AuthMustBeProvided in spacemoon/login" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="spacemoon-backend" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="spacemoon/server" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/server/spacemoon.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestCategory_DELETE in spacemoon/server/category_handler" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="spacemoon-backend" />
-      <working_directory value="$PROJECT_DIR$/server/category_handler" />
+      <working_directory value="$PROJECT_DIR$/login" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="spacemoon/server/category_handler" />
+      <package value="spacemoon/login" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestCategory_DELETE\E$" />
+      <pattern value="^\QTestSecureHandler_AuthMustBeProvided\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestCategory_DELETE_PRODUCT in spacemoon/server/category_handler" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestSecureHandler_PasswordCannotBeEmpty in spacemoon/login" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="spacemoon-backend" />
-      <working_directory value="$PROJECT_DIR$/server/category_handler" />
+      <working_directory value="$PROJECT_DIR$/login" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="spacemoon/server/category_handler" />
+      <package value="spacemoon/login" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestCategory_DELETE_PRODUCT\E$" />
+      <pattern value="^\QTestSecureHandler_PasswordCannotBeEmpty\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestCategory_PUT in spacemoon/server/category_handler" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestSecureHandler_UsernameCannotBeEmpty in spacemoon/login" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="spacemoon-backend" />
-      <working_directory value="$PROJECT_DIR$/server/category_handler" />
+      <working_directory value="$PROJECT_DIR$/login" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="spacemoon/server/category_handler" />
+      <package value="spacemoon/login" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestCategory_PUT\E$" />
+      <pattern value="^\QTestSecureHandler_UsernameCannotBeEmpty\E$" />
       <method v="2" />
     </configuration>
     <configuration name="go test spacemoon-backend" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -115,13 +108,24 @@
       <framework value="gotest" />
       <method v="2" />
     </configuration>
+    <configuration name="go test spacemoon/login" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="spacemoon-backend" />
+      <working_directory value="$PROJECT_DIR$/login" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="spacemoon/login" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build spacemoon/server" />
         <item itemvalue="Go Test.go test spacemoon-backend" />
-        <item itemvalue="Go Test.TestCategory_DELETE_PRODUCT in spacemoon/server/category_handler" />
-        <item itemvalue="Go Test.TestCategory_DELETE in spacemoon/server/category_handler" />
-        <item itemvalue="Go Test.TestCategory_PUT in spacemoon/server/category_handler" />
+        <item itemvalue="Go Test.go test spacemoon/login" />
+        <item itemvalue="Go Test.TestSecureHandler_AuthMustBeProvided in spacemoon/login" />
+        <item itemvalue="Go Test.TestSecureHandler_PasswordCannotBeEmpty in spacemoon/login" />
+        <item itemvalue="Go Test.TestSecureHandler_UsernameCannotBeEmpty in spacemoon/login" />
       </list>
     </recent_temporary>
   </component>
@@ -165,6 +169,6 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/spacemoon_backend$go_test_spacemoon_backend.out" NAME="go test spacemoon-backend Coverage Results" MODIFIED="1670087212487" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="GoCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+    <SUITE FILE_PATH="coverage/spacemoon_backend$go_test_spacemoon_backend.out" NAME="go test spacemoon-backend Coverage Results" MODIFIED="1670097883514" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="GoCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>
