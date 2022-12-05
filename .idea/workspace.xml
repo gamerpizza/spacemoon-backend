@@ -5,9 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fb7450d0-478b-4c8e-8345-f60a5124a900" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/login/login.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/login/login_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/login/token.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/login/token_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/login/login.go" beforeDir="false" afterPath="$PROJECT_DIR$/login/login.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/login/login_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/login/login_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,8 +63,16 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.go test spacemoon-backend">
-    <configuration name="TestSecureHandler_AuthMustBeProvided in spacemoon/login" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Test.TestMakeToken_DefaultSizedTokenShouldBeUniqueAmongAMillionUsers in spacemoon/login">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="spacemoon-backend" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestHandler_Auth in spacemoon/login" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="spacemoon-backend" />
       <working_directory value="$PROJECT_DIR$/login" />
       <root_directory value="$PROJECT_DIR$" />
@@ -71,10 +81,10 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestSecureHandler_AuthMustBeProvided\E$" />
+      <pattern value="^\QTestHandler_Auth\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestSecureHandler_PasswordCannotBeEmpty in spacemoon/login" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestMakeToken in spacemoon/login" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="spacemoon-backend" />
       <working_directory value="$PROJECT_DIR$/login" />
       <root_directory value="$PROJECT_DIR$" />
@@ -83,10 +93,10 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestSecureHandler_PasswordCannotBeEmpty\E$" />
+      <pattern value="^\QTestMakeToken\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestSecureHandler_UsernameCannotBeEmpty in spacemoon/login" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestMakeToken_DefaultSizedTokenShouldBeUniqueAmongAMillionUsers in spacemoon/login" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="spacemoon-backend" />
       <working_directory value="$PROJECT_DIR$/login" />
       <root_directory value="$PROJECT_DIR$" />
@@ -95,25 +105,37 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestSecureHandler_UsernameCannotBeEmpty\E$" />
+      <pattern value="^\QTestMakeToken_DefaultSizedTokenShouldBeUniqueAmongAMillionUsers\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="go test spacemoon-backend" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestMakeToken_TokenShouldBe in spacemoon/login" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="spacemoon-backend" />
+      <working_directory value="$PROJECT_DIR$/login" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="spacemoon/login" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestMakeToken_TokenShouldBe\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestMakeToken_TokenShouldBeUnique in spacemoon/login" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="spacemoon-backend" />
+      <working_directory value="$PROJECT_DIR$/login" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="spacemoon/login" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestMakeToken_TokenShouldBeUnique\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
       <module name="spacemoon-backend" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="DIRECTORY" />
-      <package value="spacemoon" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <method v="2" />
-    </configuration>
-    <configuration name="go test spacemoon/login" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="spacemoon-backend" />
-      <working_directory value="$PROJECT_DIR$/login" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="spacemoon/login" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
@@ -121,11 +143,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.go test spacemoon-backend" />
-        <item itemvalue="Go Test.go test spacemoon/login" />
-        <item itemvalue="Go Test.TestSecureHandler_AuthMustBeProvided in spacemoon/login" />
-        <item itemvalue="Go Test.TestSecureHandler_PasswordCannotBeEmpty in spacemoon/login" />
-        <item itemvalue="Go Test.TestSecureHandler_UsernameCannotBeEmpty in spacemoon/login" />
+        <item itemvalue="Go Test.TestMakeToken_DefaultSizedTokenShouldBeUniqueAmongAMillionUsers in spacemoon/login" />
+        <item itemvalue="Go Test.TestMakeToken_TokenShouldBeUnique in spacemoon/login" />
+        <item itemvalue="Go Test.TestMakeToken_TokenShouldBe in spacemoon/login" />
+        <item itemvalue="Go Test.TestMakeToken in spacemoon/login" />
+        <item itemvalue="Go Test.TestHandler_Auth in spacemoon/login" />
       </list>
     </recent_temporary>
   </component>
@@ -169,6 +191,6 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/spacemoon_backend$go_test_spacemoon_backend.out" NAME="go test spacemoon-backend Coverage Results" MODIFIED="1670097883514" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="GoCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+    <SUITE FILE_PATH="coverage/spacemoon_backend$go_test_spacemoon_backend.out" NAME="go test spacemoon-backend Coverage Results" MODIFIED="1670250108383" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="GoCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>
