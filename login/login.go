@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-func NewHandler(p Persistence, duration time.Duration) http.Handler {
-	return &handler{persistence: p, tokenExpirationTime: duration}
+func NewHandler(p Persistence, tokenDuration time.Duration) http.Handler {
+	return &handler{persistence: p, tokenExpirationTime: tokenDuration}
 }
 
 type handler struct {
@@ -134,4 +134,4 @@ const emptyUsernameMessage = "username cannot be empty"
 const emptyPasswordMessage = "password cannot be empty"
 const emptyAuthMessage = "you need to provide a username and corresponding password"
 
-var defaultTokenDuration = time.Hour
+var DefaultTokenDuration = time.Hour

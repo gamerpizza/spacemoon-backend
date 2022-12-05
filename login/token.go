@@ -37,8 +37,8 @@ func (t tokenGenerator) NewToken(size int) Token {
 
 type Token string
 type TokenDetails struct {
-	user       User
-	expiration time.Time
+	User       User
+	Expiration time.Time
 }
 
 type Credentials map[Token]TokenDetails

@@ -11,7 +11,7 @@ import (
 )
 
 func TestHandler_AuthCannotBeEmpty(t *testing.T) {
-	h, spy, request := setUpGetRequest(defaultTokenDuration)
+	h, spy, request := setUpGetRequest(DefaultTokenDuration)
 	h.ServeHTTP(&spy, request)
 	if spy.statusCode != http.StatusBadRequest || !strings.Contains(spy.body, emptyAuthMessage) {
 		t.Fatal("did not catch the missing username")
@@ -19,7 +19,7 @@ func TestHandler_AuthCannotBeEmpty(t *testing.T) {
 }
 
 func TestHandler_UsernameCannotBeEmpty(t *testing.T) {
-	h, spy, request := setUpGetRequest(defaultTokenDuration)
+	h, spy, request := setUpGetRequest(DefaultTokenDuration)
 
 	request.SetBasicAuth("", "pass")
 	h.ServeHTTP(&spy, request)
@@ -29,7 +29,7 @@ func TestHandler_UsernameCannotBeEmpty(t *testing.T) {
 }
 
 func TestHandler_PasswordCannotBeEmpty(t *testing.T) {
-	h, spy, request := setUpGetRequest(defaultTokenDuration)
+	h, spy, request := setUpGetRequest(DefaultTokenDuration)
 
 	request.SetBasicAuth("user", "")
 	h.ServeHTTP(&spy, request)
@@ -39,21 +39,9 @@ func TestHandler_PasswordCannotBeEmpty(t *testing.T) {
 }
 
 func TestHandler_Auth(t *testing.T) {
-	h, spy, request := setUpGetRequest(defaultTokenDuration)
-
-	request.SetBasicAuth(expectedUser, expectedPass)
-	h.ServeHTTP(&spy, request)
-	if spy.statusCode != http.StatusOK {
-		t.Fatal("expected credentials not recognized")
-	}
-	if !strings.Contains(spy.body, "token") {
-		t.Fatal("expected token not received")
-	}
-	token := Token(strings.TrimLeft(spy.body, "token: "))
-
-	if user, err := h.persistence.GetUser(token); err != nil || user != expectedUser {
-		t.Fatal("expected user not associated to token")
-	}
+	h, spy, request := setUpGetRequest(DefaultTokenDuration)
+	token := getTokenFromHTTPCall(t, request, h, spy)
+	checkIfTokenIsAssociatedWithExpectedUser(t, h, token)
 }
 
 func TestHandler_TokenExpiration(t *testing.T) {
@@ -78,6 +66,25 @@ func TestHandler_TokenExpiration(t *testing.T) {
 	if user, err := h.persistence.GetUser(token); !errors.Is(err, tokenExpiredError) || user != "" {
 		t.Fatal("token did not expire")
 	}
+}
+
+func checkIfTokenIsAssociatedWithExpectedUser(t *testing.T, h *handler, token Token) {
+	if user, err := h.persistence.GetUser(token); err != nil || user != expectedUser {
+		t.Fatal("expected user not associated to token")
+	}
+}
+
+func getTokenFromHTTPCall(t *testing.T, request *http.Request, h *handler, spy spyWriter) Token {
+	request.SetBasicAuth(expectedUser, expectedPass)
+	h.ServeHTTP(&spy, request)
+	if spy.statusCode != http.StatusOK {
+		t.Fatal("expected credentials not recognized")
+	}
+	if !strings.Contains(spy.body, "token") {
+		t.Fatal("expected token not received")
+	}
+	token := Token(strings.TrimLeft(spy.body, "token: "))
+	return token
 }
 
 func setUpGetRequest(tokenDuration time.Duration) (*handler, spyWriter, *http.Request) {
@@ -115,8 +122,8 @@ func (s *mockPersistence) SetUserToken(user User, token Token, timeToLive time.D
 		s.tokens = make(Credentials)
 	}
 	s.tokens[token] = TokenDetails{
-		user:       user,
-		expiration: time.Now().Add(timeToLive),
+		User:       user,
+		Expiration: time.Now().Add(timeToLive),
 	}
 }
 
@@ -125,10 +132,10 @@ func (s *mockPersistence) GetUser(token Token) (User, error) {
 	if !exists {
 		return "", tokenNotFoundError
 	}
-	if tokenData.expiration.Before(time.Now()) {
+	if tokenData.Expiration.Before(time.Now()) {
 		return "", tokenExpiredError
 	}
-	return tokenData.user, nil
+	return tokenData.User, nil
 }
 
 func (s *mockPersistence) ValidateCredentials(u User, p Password) bool {
