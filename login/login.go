@@ -3,34 +3,79 @@ package login
 import (
 	"net/http"
 	"strings"
+	"time"
 )
 
-func NewHandler(p Persistence) http.Handler {
-	return handler{persistence: p}
+func NewHandler(p Persistence, duration time.Duration) http.Handler {
+	return &handler{persistence: p, tokenExpirationTime: duration}
 }
 
 type handler struct {
-	persistence Persistence
+	persistence         Persistence
+	writer              http.ResponseWriter
+	request             *http.Request
+	tokenExpirationTime time.Duration
 }
 
-func (h handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	user, pass, ok := request.BasicAuth()
-	if !ok {
-		writer.WriteHeader(http.StatusBadRequest)
-		_, _ = writer.Write([]byte(emptyAuthMessage))
-		return
-	}
-	if strings.TrimSpace(user) == "" {
-		writer.WriteHeader(http.StatusBadRequest)
-		_, _ = writer.Write([]byte(emptyUsernameMessage))
-		return
-	}
-	if strings.TrimSpace(pass) == "" {
-		writer.WriteHeader(http.StatusBadRequest)
-		_, _ = writer.Write([]byte(emptyPasswordMessage))
-		return
-	}
+func (h *handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	h.writer = writer
+	h.request = request
 
+	switch request.Method {
+	case http.MethodGet:
+		h.login()
+	default:
+		writer.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
+
+func (h *handler) login() {
+	user, pass, ok := h.request.BasicAuth()
+	if h.validateBasicAuth(ok) {
+		return
+	}
+	if h.validateUserName(user) {
+		return
+	}
+	if h.validatePassword(pass) {
+		return
+	}
+	newToken := NewTokenGenerator().NewToken(UseDefaultSize)
+
+	h.persistence.SetUserToken(User(user), newToken, h.tokenExpirationTime)
+	h.respondWithAccessToken(newToken)
+}
+
+func (h *handler) respondWithAccessToken(token Token) {
+	h.writer.WriteHeader(http.StatusOK)
+	_, _ = h.writer.Write([]byte("token: " + token))
+}
+
+func (h *handler) validatePassword(pass string) bool {
+	if strings.TrimSpace(pass) == "" {
+		h.writer.WriteHeader(http.StatusBadRequest)
+		_, _ = h.writer.Write([]byte(emptyPasswordMessage))
+		return true
+	}
+	return false
+}
+
+func (h *handler) validateUserName(user string) bool {
+	if strings.TrimSpace(user) == "" {
+		h.writer.WriteHeader(http.StatusBadRequest)
+		_, _ = h.writer.Write([]byte(emptyUsernameMessage))
+		return true
+	}
+	return false
+}
+
+func (h *handler) validateBasicAuth(ok bool) bool {
+	if !ok {
+		h.writer.WriteHeader(http.StatusBadRequest)
+		_, _ = h.writer.Write([]byte(emptyAuthMessage))
+		return true
+	}
+	return false
 }
 
 func NewProtector(p Persistence) Protector {
@@ -43,6 +88,8 @@ type Protector interface {
 
 type Persistence interface {
 	ValidateCredentials(usr User, p Password) bool
+	GetUser(token Token) (User, error)
+	SetUserToken(user User, token Token, timeToLive time.Duration)
 }
 
 type protector struct {
@@ -86,3 +133,5 @@ type Password string
 const emptyUsernameMessage = "username cannot be empty"
 const emptyPasswordMessage = "password cannot be empty"
 const emptyAuthMessage = "you need to provide a username and corresponding password"
+
+var defaultTokenDuration = time.Hour

@@ -1,6 +1,7 @@
 package login
 
 import (
+	"errors"
 	"math/rand"
 	"time"
 )
@@ -35,6 +36,12 @@ func (t tokenGenerator) NewToken(size int) Token {
 }
 
 type Token string
+type TokenDetails struct {
+	user       User
+	expiration time.Time
+}
+
+type Credentials map[Token]TokenDetails
 
 // TokenCharacters defines the characters that can be used to generate a token
 const TokenCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_~"
@@ -42,3 +49,7 @@ const TokenCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123
 // DefaultTokenSize is "The Answer to life, the Universe and Everything", it has space for around 1.39*10^76
 // possibilities, so it should not repeat itself
 const DefaultTokenSize = 42
+const UseDefaultSize = 0
+
+var tokenExpiredError = errors.New("token expired")
+var tokenNotFoundError = errors.New("token not found")

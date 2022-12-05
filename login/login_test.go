@@ -1,17 +1,17 @@
 package login
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestHandler_AuthCannotBeEmpty(t *testing.T) {
-	var h http.Handler = handler{}
-	spy := spyWriter{}
-	request := httptest.NewRequest(http.MethodGet, "/login", http.NoBody)
+	h, spy, request := setUpGetRequest(defaultTokenDuration)
 	h.ServeHTTP(&spy, request)
 	if spy.statusCode != http.StatusBadRequest || !strings.Contains(spy.body, emptyAuthMessage) {
 		t.Fatal("did not catch the missing username")
@@ -19,9 +19,8 @@ func TestHandler_AuthCannotBeEmpty(t *testing.T) {
 }
 
 func TestHandler_UsernameCannotBeEmpty(t *testing.T) {
-	var h http.Handler = handler{}
-	spy := spyWriter{}
-	request := httptest.NewRequest(http.MethodGet, "/login", http.NoBody)
+	h, spy, request := setUpGetRequest(defaultTokenDuration)
+
 	request.SetBasicAuth("", "pass")
 	h.ServeHTTP(&spy, request)
 	if spy.statusCode != http.StatusBadRequest || !strings.Contains(spy.body, emptyUsernameMessage) {
@@ -30,9 +29,8 @@ func TestHandler_UsernameCannotBeEmpty(t *testing.T) {
 }
 
 func TestHandler_PasswordCannotBeEmpty(t *testing.T) {
-	var h http.Handler = handler{}
-	spy := spyWriter{}
-	request := httptest.NewRequest(http.MethodGet, "/login", http.NoBody)
+	h, spy, request := setUpGetRequest(defaultTokenDuration)
+
 	request.SetBasicAuth("user", "")
 	h.ServeHTTP(&spy, request)
 	if spy.statusCode != http.StatusBadRequest || !strings.Contains(spy.body, emptyPasswordMessage) {
@@ -41,58 +39,52 @@ func TestHandler_PasswordCannotBeEmpty(t *testing.T) {
 }
 
 func TestHandler_Auth(t *testing.T) {
-	var testPersistence Persistence = stubPersistence{}
-	var h http.Handler = NewHandler(testPersistence)
-	spy := spyWriter{}
-	request := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
+	h, spy, request := setUpGetRequest(defaultTokenDuration)
+
 	request.SetBasicAuth(expectedUser, expectedPass)
 	h.ServeHTTP(&spy, request)
-	if spy.statusCode == http.StatusUnauthorized {
+	if spy.statusCode != http.StatusOK {
 		t.Fatal("expected credentials not recognized")
 	}
 	if !strings.Contains(spy.body, "token") {
 		t.Fatal("expected token not received")
 	}
+	token := Token(strings.TrimLeft(spy.body, "token: "))
+
+	if user, err := h.persistence.GetUser(token); err != nil || user != expectedUser {
+		t.Fatal("expected user not associated to token")
+	}
 }
 
-func TestProtector_Auth(t *testing.T) {
-	sh := createSecureHandler()
-	testValidCredentials(t, sh)
-	testInvalidCredentials(t, sh)
-}
+func TestHandler_TokenExpiration(t *testing.T) {
 
-func createSecureHandler() http.Handler {
-	var pe Persistence = stubPersistence{}
-	var pr Protector = NewProtector(pe)
-	var h http.Handler = fakeHandler{}
-	sh := pr.SecureHandler(h)
-	return sh
-}
+	h, spy, request := setUpGetRequest(2 * time.Second)
 
-func testValidCredentials(t *testing.T, sh http.Handler) {
-	spy := spyWriter{}
-	request := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
 	request.SetBasicAuth(expectedUser, expectedPass)
-	sh.ServeHTTP(&spy, request)
-	if spy.statusCode == http.StatusUnauthorized {
+	h.ServeHTTP(&spy, request)
+	if spy.statusCode != http.StatusOK {
 		t.Fatal("expected credentials not recognized")
 	}
-}
+	if !strings.Contains(spy.body, "token") {
+		t.Fatal("expected token not received")
+	}
+	token := Token(strings.TrimLeft(spy.body, "token: "))
 
-func testInvalidCredentials(t *testing.T, sh http.Handler) {
-	failingRequest := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
-	failingRequest.SetBasicAuth("bad-user", "bad-pass")
-	failingSpy := spyWriter{}
-	sh.ServeHTTP(&failingSpy, failingRequest)
-	if failingSpy.statusCode != http.StatusUnauthorized {
-		t.Fatal("bad credentials not recognized")
+	if user, err := h.persistence.GetUser(token); err != nil || user != expectedUser {
+		t.Fatal("expected user not associated to token")
+	}
+
+	time.Sleep(3 * time.Second)
+	if user, err := h.persistence.GetUser(token); !errors.Is(err, tokenExpiredError) || user != "" {
+		t.Fatal("token did not expire")
 	}
 }
 
-type fakeHandler struct {
-}
-
-func (f fakeHandler) ServeHTTP(_ http.ResponseWriter, _ *http.Request) {
+func setUpGetRequest(tokenDuration time.Duration) (*handler, spyWriter, *http.Request) {
+	var h = NewHandler(&mockPersistence{}, tokenDuration)
+	spy := spyWriter{}
+	request := httptest.NewRequest(http.MethodGet, "/login", http.NoBody)
+	return h.(*handler), spy, request
 }
 
 type spyWriter struct {
@@ -114,10 +106,32 @@ func (s *spyWriter) WriteHeader(statusCode int) {
 	s.statusCode = statusCode
 }
 
-type stubPersistence struct {
+type mockPersistence struct {
+	tokens Credentials
 }
 
-func (s stubPersistence) ValidateCredentials(u User, p Password) bool {
+func (s *mockPersistence) SetUserToken(user User, token Token, timeToLive time.Duration) {
+	if s.tokens == nil {
+		s.tokens = make(Credentials)
+	}
+	s.tokens[token] = TokenDetails{
+		user:       user,
+		expiration: time.Now().Add(timeToLive),
+	}
+}
+
+func (s *mockPersistence) GetUser(token Token) (User, error) {
+	tokenData, exists := s.tokens[token]
+	if !exists {
+		return "", tokenNotFoundError
+	}
+	if tokenData.expiration.Before(time.Now()) {
+		return "", tokenExpiredError
+	}
+	return tokenData.user, nil
+}
+
+func (s *mockPersistence) ValidateCredentials(u User, p Password) bool {
 	if u != expectedUser || p != expectedPass {
 		return false
 	}
