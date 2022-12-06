@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type Persistence interface {
+	SetUserToken(user User, token Token, expirationTime time.Duration)
+	GetUser(Token) (User, error)
+}
+
 func NewHandler(p Persistence, tokenDuration time.Duration) http.Handler {
 	return &handler{persistence: p, tokenExpirationTime: tokenDuration}
 }
@@ -76,55 +81,6 @@ func (h *handler) validateBasicAuth(ok bool) bool {
 		return true
 	}
 	return false
-}
-
-func NewProtector(p Persistence) Protector {
-	return protector{persistence: p}
-}
-
-type Protector interface {
-	SecureHandler(http.Handler) http.Handler
-}
-
-type Persistence interface {
-	ValidateCredentials(usr User, p Password) bool
-	GetUser(token Token) (User, error)
-	SetUserToken(user User, token Token, timeToLive time.Duration)
-}
-
-type protector struct {
-	persistence Persistence
-}
-
-func (p protector) SecureHandler(h http.Handler) http.Handler {
-	return SecuredHandler{handler: h, persistence: p.persistence}
-}
-
-type SecuredHandler struct {
-	handler     http.Handler
-	persistence Persistence
-}
-
-func (s SecuredHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	user, pass, ok := request.BasicAuth()
-	if !ok {
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	if strings.TrimSpace(user) == "" {
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	if strings.TrimSpace(pass) == "" {
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	isAuthenticated := s.persistence.ValidateCredentials(User(user), Password(pass))
-	if !isAuthenticated {
-		writer.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-	s.handler.ServeHTTP(writer, request)
 }
 
 type User string
