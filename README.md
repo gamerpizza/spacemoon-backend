@@ -20,7 +20,14 @@ Right now, it is using PORT 1234 to receive the requests.
 * Stripe payment processing
 * Instant Pay payment processing
 * Google Pay payment processing
+
+
+##  [v0.2.0] - _2022 12 03_
+### Added
 * Login and authentication token for private API calls
+* All methods except GET protected for products
+* All methods except GET protected for categories
+* Updated README instructions
 
 ##  [v0.1.0] - _2022 12 03_
 ### Added
