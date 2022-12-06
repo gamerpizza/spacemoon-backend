@@ -16,9 +16,9 @@ func TestProtectedHandler_RequiresToken(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	protectedHandler.ServeHTTP(&spy, request)
-	badRequestInResponseHeader := checkForStatus(spy, http.StatusBadRequest)
-	if !badRequestInResponseHeader {
-		t.Fatal("bad request uncaught (no bearer token)")
+	unauthorizedStatusInResponseHeader := checkForStatus(spy, http.StatusUnauthorized)
+	if !unauthorizedStatusInResponseHeader {
+		t.Fatalf("%+v", spy)
 	}
 }
 
@@ -38,9 +38,36 @@ func TestProtected_ServeHTTP_ProxiesTheProtectedHandler(t *testing.T) {
 
 func TestProtected_UsesTokenFromLogin(t *testing.T) {
 	fakePersistence := mockLoginPersistence{}
-	token := loginExpectedUser(t, fakePersistence)
-	protectedHandler := validateTokenOnProtectedHandler(t, fakePersistence, token)
+	token := loginExpectedUser(t, &fakePersistence)
+	protectedHandler := validateTokenOnProtectedHandler(t, &fakePersistence, token)
 	validateBadTokenOnProtectedHandler(t, protectedHandler)
+}
+
+func TestProtector_SetUnprotectedMethod(t *testing.T) {
+	var p Protector = NewProtector(&mockLoginPersistence{})
+	var testHandler http.Handler = fakeHandler{}
+	ph := p.Protect(&testHandler)
+	ph.Unprotect(http.MethodGet)
+
+	publicSpy, publicRequest, err := prepareRequest(http.MethodGet, "/whatever", http.NoBody)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	ph.ServeHTTP(&publicSpy, publicRequest)
+	accepted := checkForStatus(publicSpy, http.StatusAccepted)
+	if !accepted {
+		t.Fatalf("%+v", publicSpy)
+	}
+
+	privateSpy, privateRequest, err := prepareRequest(http.MethodPost, "/whatever", http.NoBody)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	ph.ServeHTTP(&privateSpy, privateRequest)
+	unauthorized := checkForStatus(privateSpy, http.StatusUnauthorized)
+	if !unauthorized {
+		t.Fatalf("%+v", privateSpy)
+	}
 }
 
 func validateBadTokenOnProtectedHandler(t *testing.T, protectedHandler http.Handler) {
@@ -55,24 +82,24 @@ func validateBadTokenOnProtectedHandler(t *testing.T, protectedHandler http.Hand
 	}
 }
 
-func validateTokenOnProtectedHandler(t *testing.T, fakePersistence mockLoginPersistence, token string) http.Handler {
-	p := NewProtector(&fakePersistence)
+func validateTokenOnProtectedHandler(t *testing.T, fakePersistence Persistence, token string) http.Handler {
+	p := NewProtector(fakePersistence)
 	var testHandler http.Handler = fakeHandler{}
 	protectedHandler := p.Protect(&testHandler)
-	bearerSpy, bearerRequest, err := prepareRequest(http.MethodGet, "/whatever", http.NoBody)
+	spy, req, err := prepareRequest(http.MethodGet, "/whatever", http.NoBody)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	bearerRequest.Header.Add("Authorization", "Bearer "+token)
-	protectedHandler.ServeHTTP(&bearerSpy, bearerRequest)
-	if bearerSpy.statusCode != http.StatusAccepted {
-		t.Fatalf("unexpected response: %+v", bearerSpy)
+	req.Header.Add("Authorization", "Bearer "+token)
+	protectedHandler.ServeHTTP(&spy, req)
+	if spy.statusCode != http.StatusAccepted {
+		t.Fatalf("unexpected response: %+v", spy)
 	}
 	return protectedHandler
 }
 
-func loginExpectedUser(t *testing.T, fakePersistence mockLoginPersistence) string {
-	loginHandler := NewHandler(&fakePersistence, DefaultTokenDuration)
+func loginExpectedUser(t *testing.T, fakePersistence Persistence) string {
+	loginHandler := NewHandler(fakePersistence, DefaultTokenDuration)
 	spy, req, err := prepareRequest(http.MethodGet, "/login", http.NoBody)
 	if err != nil {
 		t.Fatal(err.Error())

@@ -9,33 +9,47 @@ func NewProtector(p Persistence) Protector {
 	return protector{persistence: p}
 }
 
+type ProtectedHandler interface {
+	http.Handler
+	Unprotect(method string)
+}
+
 type Protector interface {
-	Protect(*http.Handler) http.Handler
+	Protect(*http.Handler) ProtectedHandler
 }
 
 type protector struct {
 	persistence Persistence
 }
 
-func (p protector) Protect(h *http.Handler) http.Handler {
-	return protected{handler: h, persistence: p.persistence}
+func (p protector) Protect(h *http.Handler) ProtectedHandler {
+	return &protected{handler: h, persistence: p.persistence}
 }
 
 type protected struct {
-	handler     *http.Handler
-	persistence Persistence
+	handler            *http.Handler
+	persistence        Persistence
+	unprotectedMethods []string
 }
 
-func (p protected) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (p *protected) Unprotect(httpMethod string) {
+	p.unprotectedMethods = append(p.unprotectedMethods, httpMethod)
+}
+
+func (p *protected) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	protectedHandler := *p.handler
+	if contains(p.unprotectedMethods, r.Method) {
+		protectedHandler.ServeHTTP(w, r)
+		return
+	}
 	bearer := r.Header.Get("Authorization")
 	if p.validateToken(w, bearer) {
 		return
 	}
-	protectedHandler := *p.handler
 	protectedHandler.ServeHTTP(w, r)
 }
 
-func (p protected) validateToken(w http.ResponseWriter, bearer string) bool {
+func (p *protected) validateToken(w http.ResponseWriter, bearer string) bool {
 	if validateBearerTokenPresence(w, bearer) {
 		return true
 	}
@@ -47,7 +61,7 @@ func (p protected) validateToken(w http.ResponseWriter, bearer string) bool {
 	return false
 }
 
-func (p protected) getUserFromToken(w http.ResponseWriter, token Token) (User, error) {
+func (p *protected) getUserFromToken(w http.ResponseWriter, token Token) (User, error) {
 	u, err := p.persistence.GetUser(token)
 	if err != nil {
 		w.WriteHeader(http.StatusForbidden)
@@ -59,7 +73,7 @@ func (p protected) getUserFromToken(w http.ResponseWriter, token Token) (User, e
 
 func validateBearerTokenPresence(w http.ResponseWriter, bearer string) bool {
 	if strings.TrimSpace(bearer) == "" {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusUnauthorized)
 		_, _ = w.Write([]byte("no bearer token"))
 		return true
 	}
@@ -68,4 +82,13 @@ func validateBearerTokenPresence(w http.ResponseWriter, bearer string) bool {
 
 func extractToken(bearer string) Token {
 	return Token(strings.TrimPrefix(bearer, "Bearer "))
+}
+
+func contains(methods []string, method string) bool {
+	for _, m := range methods {
+		if method == m {
+			return true
+		}
+	}
+	return false
 }

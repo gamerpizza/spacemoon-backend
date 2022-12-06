@@ -18,9 +18,20 @@ func main() {
 func setupHandlers() {
 	log.Default().Print("starting spacemoon server 🚀")
 	log.Default().Print("registering server handlers...")
-	http.Handle("/product", product_handler.MakeHandler(&temporaryProductPersistence{}))
-	http.Handle("/category", category_handler.MakeHandler(&temporaryCategoryPersistence{}))
+
 	http.Handle("/login", login.NewHandler(loginPersistence, time.Hour))
+
+	protector := login.NewProtector(loginPersistence)
+	productHandler := product_handler.MakeHandler(&temporaryProductPersistence{})
+	protectedProductHandler := protector.Protect(&productHandler)
+	protectedProductHandler.Unprotect(http.MethodGet)
+	http.Handle("/product", protectedProductHandler)
+
+	categoryHandler := category_handler.MakeHandler(&temporaryCategoryPersistence{})
+	protectedCategoryHandler := protector.Protect(&categoryHandler)
+	protectedCategoryHandler.Unprotect(http.MethodGet)
+	http.Handle("/category", protectedCategoryHandler)
+
 	log.Default().Print("handler registration done, ready for takeoff")
 }
 
