@@ -1,6 +1,7 @@
 package login
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 	"time"
@@ -89,5 +90,8 @@ type Password string
 const emptyUsernameMessage = "username cannot be empty"
 const emptyPasswordMessage = "password cannot be empty"
 const emptyAuthMessage = "you need to provide a username and corresponding password"
+
+var TokenNotFoundError = errors.New("token not found")
+var ExpiredTokenError = errors.New("expired token")
 
 var DefaultTokenDuration = time.Hour

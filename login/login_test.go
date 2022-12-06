@@ -130,7 +130,7 @@ func (s *mockPersistence) SetUserToken(user User, token Token, timeToLive time.D
 func (s *mockPersistence) GetUser(token Token) (User, error) {
 	tokenData, exists := s.tokens[token]
 	if !exists {
-		return "", tokenNotFoundError
+		return "", TokenNotFoundError
 	}
 	if tokenData.Expiration.Before(time.Now()) {
 		return "", tokenExpiredError
