@@ -12,12 +12,13 @@ import (
 )
 
 func main() {
+	log.Default().Print("starting spacemoon server 🚀")
+	log.Default().Print("v0.2.1")
 	setupHandlers()
 	listenAndServe()
 }
 
 func setupHandlers() {
-	log.Default().Print("starting spacemoon server 🚀")
 	log.Default().Print("registering server handlers...")
 
 	http.Handle("/login", login.NewHandler(loginPersistence, time.Hour))
