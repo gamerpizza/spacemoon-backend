@@ -15,11 +15,14 @@ func TestProduct(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not instantiate new product")
 	}
+	const productType = "cool product"
+	testProduct.SetType(productType)
 	expectedDTO := Dto{
 		Name:        testName,
 		Price:       testPrice,
 		Description: testDescription,
 		Id:          testProduct.GetId(),
+		Type:        productType,
 	}
 	dto := testProduct.DTO()
 	if dto != expectedDTO {
@@ -34,6 +37,7 @@ func TestProduct(t *testing.T) {
 	if testProduct.GetDescription() != testDescription {
 		t.Fatalf("invalid description, expected '%s' obtained '%s'\n", testDescription, testProduct.GetDescription())
 	}
+	var _ Type = testProduct.GetType()
 }
 
 func TestNew_ThrowsErrorOnEmptyName(t *testing.T) {

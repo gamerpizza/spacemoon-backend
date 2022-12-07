@@ -1,3 +1,4 @@
+// Package product manages the core business logic of what a basic product is and how it is defined.
 package product
 
 import (
@@ -34,6 +35,8 @@ type Product interface {
 	GetPrice() Price
 	GetDescription() Description
 	DTO() Dto
+	GetType() Type
+	SetType(Type)
 }
 
 // Dto is a representation of a product, with a given Price, Name, Rating and Description, used for data transfer.
@@ -42,6 +45,15 @@ type Dto struct {
 	Price       Price       `json:"price"`
 	Description Description `json:"description"`
 	Id          Id          `json:"id"`
+	Type        Type        `json:"type"`
+}
+
+func (d Dto) SetType(_ Type) {
+
+}
+
+func (d Dto) GetType() Type {
+	return ""
 }
 
 func (d Dto) GetId() Id {
@@ -66,6 +78,8 @@ func (d Dto) GetDescription() Description {
 	return d.Description
 }
 
+// Name is the name of the product. I may be non-unique, as the product uses a UUID to identify different SKUs
+// and different instances of the same product with different characteristics.
 type Name string
 
 // Id returns is Product unique identifier (UUID). We are not using the Name as Id because two products could have
@@ -76,10 +90,16 @@ type Id string
 // Price is an int to avoid floating comma errors when working with fractional amounts. It makes more sense to use an
 // integer number of the smallest monetary unit possible (cents, satoshis, etc.) than to use a floating point.
 type Price int
+
+// Description is an open field to add any information about the product that won't participate in the business logic,
+// as a form of "notes" or "extra information" normally expected to be displayed somewhere in the front-end.
 type Description string
 
-// EmptyNameError is returned when trying to create a product with an empty name.
-var EmptyNameError = errors.New("name cannot be empty")
+// Type is a short description/name for the type of product
+type Type string
 
 // Products represents the product.Product contents of a category
 type Products map[Id]Dto
+
+// EmptyNameError is returned when trying to create a product with an empty name.
+var EmptyNameError = errors.New("name cannot be empty")
