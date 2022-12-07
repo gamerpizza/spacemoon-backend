@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"spacemoon/login"
 	"spacemoon/server/category_handler"
+	"spacemoon/server/cors"
 	"spacemoon/server/product_handler"
 	"time"
 )
@@ -20,19 +21,26 @@ func setupHandlers() {
 	log.Default().Print("registering server handlers...")
 
 	http.Handle("/login", login.NewHandler(loginPersistence, time.Hour))
-
 	protector := login.NewProtector(loginPersistence)
+
 	productHandler := product_handler.MakeHandler(&temporaryProductPersistence{})
-	protectedProductHandler := protector.Protect(&productHandler)
-	protectedProductHandler.Unprotect(http.MethodGet)
-	http.Handle("/product", protectedProductHandler)
+	preparedProductHandler := prepareHandler(protector, productHandler, http.MethodGet)
+	http.Handle("/product", preparedProductHandler)
 
 	categoryHandler := category_handler.MakeHandler(&temporaryCategoryPersistence{})
-	protectedCategoryHandler := protector.Protect(&categoryHandler)
-	protectedCategoryHandler.Unprotect(http.MethodGet)
-	http.Handle("/category", protectedCategoryHandler)
+	preparedCategoryHandler := prepareHandler(protector, categoryHandler, http.MethodGet)
+	http.Handle("/category", preparedCategoryHandler)
 
 	log.Default().Print("handler registration done, ready for takeoff")
+}
+
+func prepareHandler(protector login.Protector, handler http.Handler, methods ...string) http.Handler {
+	protectedHandler := protector.Protect(&handler)
+	for _, method := range methods {
+		protectedHandler.Unprotect(method)
+	}
+	corsEnabledProtectedProductHandler := cors.EnableCors(protectedHandler)
+	return corsEnabledProtectedProductHandler
 }
 
 func listenAndServe() {
