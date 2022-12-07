@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// EnableCors creates a decorator handler that handles all CORS aspects for a given handler.
 func EnableCors(h http.Handler, methods ...string) http.Handler {
 	allowed := "OPTIONS, "
 	for _, method := range methods {

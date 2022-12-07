@@ -23,7 +23,7 @@ Right now, it is using PORT 1234 to receive the requests.
 
 ##  [v0.2.2] - _2022 12 07_
 ### Fixed
-* Enabled CORS origin header on all method requests
+* Enabled CORS origin header on all requests methods response headers 
 
 ##  [v0.2.1] - _2022 12 07_
 ### Added
