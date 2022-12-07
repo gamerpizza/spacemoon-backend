@@ -49,6 +49,8 @@ const TokenCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123
 // DefaultTokenSize is "The Answer to life, the Universe and Everything", it has space for around 1.39*10^76
 // possibilities, so it should not repeat itself
 const DefaultTokenSize = 42
+
+// UseDefaultSize is used when generating a NewToken as an alternate way to ask for it to be of the DefaultTokenSize
 const UseDefaultSize = 0
 
 var tokenExpiredError = errors.New("token expired")
