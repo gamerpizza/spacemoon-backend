@@ -21,7 +21,8 @@ func main() {
 func setupHandlers() {
 	log.Default().Print("registering server handlers...")
 
-	http.Handle("/login", login.NewHandler(loginPersistence, time.Hour))
+	corsEnabledLoginHandler := cors.EnableCors(login.NewHandler(loginPersistence, time.Hour), http.MethodGet)
+	http.Handle("/login", corsEnabledLoginHandler)
 	protector := login.NewProtector(loginPersistence)
 
 	productHandler := product_handler.MakeHandler(&temporaryProductPersistence{})
@@ -35,12 +36,13 @@ func setupHandlers() {
 	log.Default().Print("handler registration done, ready for takeoff")
 }
 
-func prepareHandler(protector login.Protector, handler http.Handler, methods ...string) http.Handler {
+func prepareHandler(protector login.Protector, handler http.Handler, unprotectedMethods ...string) http.Handler {
 	protectedHandler := protector.Protect(&handler)
-	for _, method := range methods {
+	for _, method := range unprotectedMethods {
 		protectedHandler.Unprotect(method)
 	}
-	corsEnabledProtectedProductHandler := cors.EnableCors(protectedHandler)
+	corsEnabledProtectedProductHandler := cors.EnableCors(protectedHandler,
+		http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete)
 	return corsEnabledProtectedProductHandler
 }
 
