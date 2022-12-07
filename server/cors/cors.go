@@ -23,8 +23,8 @@ type corsHandler struct {
 }
 
 func (c corsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
 	if r.Method == http.MethodOptions {
-		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Headers", "*")
 		w.Header().Add("Access-Control-Allow-Methods", c.allowed)
 		w.WriteHeader(http.StatusNoContent)
