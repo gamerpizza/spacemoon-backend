@@ -20,7 +20,7 @@ func New(n Name, p Price, d Description) (Product, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not generate uuid to create new product: %w", err)
 	}
-	return Dto{
+	return &Dto{
 		Name:        n,
 		Price:       p,
 		Description: d,
@@ -48,33 +48,33 @@ type Dto struct {
 	Type        Type        `json:"type"`
 }
 
-func (d Dto) SetType(_ Type) {
-
+func (d *Dto) SetType(t Type) {
+	d.Type = t
 }
 
-func (d Dto) GetType() Type {
-	return ""
+func (d *Dto) GetType() Type {
+	return d.Type
 }
 
-func (d Dto) GetId() Id {
+func (d *Dto) GetId() Id {
 	return d.Id
 }
 
 // DTO returns the DTO form of a product, structurally similar to what a String() method would do (but it returns a DTO
 // and not a string).
-func (d Dto) DTO() Dto {
-	return d
+func (d *Dto) DTO() Dto {
+	return *d
 }
 
-func (d Dto) GetName() Name {
+func (d *Dto) GetName() Name {
 	return d.Name
 }
 
-func (d Dto) GetPrice() Price {
+func (d *Dto) GetPrice() Price {
 	return d.Price
 }
 
-func (d Dto) GetDescription() Description {
+func (d *Dto) GetDescription() Description {
 	return d.Description
 }
 

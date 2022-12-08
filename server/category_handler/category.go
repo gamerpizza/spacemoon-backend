@@ -98,7 +98,7 @@ func (h handler) delete() {
 }
 
 func (h handler) addProductAndSave(cat category.DTO, p product.Dto) {
-	cat.AddProduct(p)
+	cat.AddProduct(&p)
 	h.persistence.SaveCategory(cat)
 	h.writer.WriteHeader(http.StatusNoContent)
 }
