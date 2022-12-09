@@ -21,6 +21,10 @@ Right now, it is using PORT 1234 to receive the requests.
 * Instant Pay payment processing
 * Google Pay payment processing
 
+##  [v0.3.0] - _2022 12 09_
+### Added
+* Basic ratings on `product/rating`
+ 
 ##  [v0.2.3] - _2022 12 07_
 ### Fixed
 * CORS pre-flight response on login handler 
