@@ -87,6 +87,16 @@ func wasThrown(err error) bool {
 type stubProduct struct {
 }
 
+func (f stubProduct) GetType() product.Type {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f stubProduct) SetType(t product.Type) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (f stubProduct) GetId() product.Id {
 	return expectedProductID
 }

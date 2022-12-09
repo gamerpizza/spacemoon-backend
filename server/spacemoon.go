@@ -13,7 +13,7 @@ import (
 
 func main() {
 	log.Default().Print("starting spacemoon server 🚀")
-	log.Default().Print("v0.2.3")
+	log.Default().Print("v0.3.0")
 	setupHandlers()
 	listenAndServe()
 }
@@ -28,6 +28,9 @@ func setupHandlers() {
 	productHandler := product_handler.MakeHandler(&temporaryProductPersistence{})
 	preparedProductHandler := prepareHandler(protector, productHandler, http.MethodGet)
 	http.Handle("/product", preparedProductHandler)
+	productRatingHandler := product_handler.MakeRankingsHandler()
+	preparedProductRatingHandler := prepareHandler(protector, productRatingHandler, http.MethodGet)
+	http.Handle("/product/rating", preparedProductRatingHandler)
 
 	categoryHandler := category_handler.MakeHandler(&temporaryCategoryPersistence{})
 	preparedCategoryHandler := prepareHandler(protector, categoryHandler, http.MethodGet)
