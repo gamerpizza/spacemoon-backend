@@ -28,7 +28,7 @@ func setupHandlers() {
 	productHandler := product_handler.MakeHandler(&temporaryProductPersistence{})
 	preparedProductHandler := prepareHandler(protector, productHandler, http.MethodGet)
 	http.Handle("/product", preparedProductHandler)
-	productRatingHandler := product_handler.MakeRankingsHandler()
+	productRatingHandler := product_handler.MakeRankingsHandler(&temporaryRatingsPersistence{})
 	preparedProductRatingHandler := prepareHandler(protector, productRatingHandler, http.MethodGet)
 	http.Handle("/product/rating", preparedProductRatingHandler)
 

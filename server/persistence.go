@@ -5,6 +5,7 @@ import (
 	"spacemoon/login"
 	"spacemoon/product"
 	"spacemoon/product/category"
+	"spacemoon/product/ratings"
 	"time"
 )
 
@@ -87,4 +88,19 @@ var loginPersistence = &temporaryLoginPersistence{}
 func init() {
 	loginPersistence.users = make(map[login.User]login.Password)
 	loginPersistence.users["admin"] = "sp4c3m00n!"
+}
+
+type temporaryRatingsPersistence struct {
+	r ratings.Ratings
+}
+
+func (t *temporaryRatingsPersistence) ReadRating(id product.Id) ratings.Rating {
+	return t.r[id]
+}
+
+func (t *temporaryRatingsPersistence) SaveRating(id product.Id, rating ratings.Rating) {
+	if t.r == nil {
+		t.r = make(ratings.Ratings)
+	}
+	t.r[id] = rating
 }
