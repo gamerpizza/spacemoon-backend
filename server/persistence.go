@@ -6,8 +6,25 @@ import (
 	"spacemoon/product"
 	"spacemoon/product/category"
 	"spacemoon/product/ratings"
+	"spacemoon/server/product_handler"
 	"time"
 )
+
+func GetLoginPersistence() login.Persistence {
+	per := &temporaryLoginPersistence{}
+	//hard coded credentials
+	per.users = make(map[login.User]login.Password)
+	per.users["admin"] = "sp4c3m00n!"
+	return per
+}
+
+func GetProductPersistence() product_handler.Persistence {
+	return &temporaryProductPersistence{}
+}
+
+func GetProductRatingsPersistence() ratings.Persistence {
+	return &temporaryRatingsPersistence{}
+}
 
 type temporaryProductPersistence struct {
 	savedProducts product.Products
@@ -83,12 +100,7 @@ func (t *temporaryLoginPersistence) SetUserToken(user login.User, token login.To
 	}
 }
 
-var loginPersistence = &temporaryLoginPersistence{}
-
-func init() {
-	loginPersistence.users = make(map[login.User]login.Password)
-	loginPersistence.users["admin"] = "sp4c3m00n!"
-}
+var loginPersistence = GetLoginPersistence()
 
 type temporaryRatingsPersistence struct {
 	r ratings.Ratings

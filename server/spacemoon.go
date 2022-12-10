@@ -25,10 +25,10 @@ func setupHandlers() {
 	http.Handle("/login", corsEnabledLoginHandler)
 	protector := login.NewProtector(loginPersistence)
 
-	productHandler := product_handler.MakeHandler(&temporaryProductPersistence{})
+	productHandler := product_handler.MakeHandler(GetProductPersistence())
 	preparedProductHandler := prepareHandler(protector, productHandler, http.MethodGet)
 	http.Handle("/product", preparedProductHandler)
-	productRatingHandler := product_handler.MakeRankingsHandler(&temporaryRatingsPersistence{})
+	productRatingHandler := product_handler.MakeRankingsHandler(GetProductRatingsPersistence())
 	preparedProductRatingHandler := prepareHandler(protector, productRatingHandler, http.MethodGet)
 	http.Handle("/product/rating", preparedProductRatingHandler)
 
