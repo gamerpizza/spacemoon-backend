@@ -114,12 +114,12 @@ func (s *spyWriter) WriteHeader(statusCode int) {
 }
 
 type mockPersistence struct {
-	tokens Credentials
+	tokens Tokens
 }
 
 func (s *mockPersistence) SetUserToken(user User, token Token, timeToLive time.Duration) {
 	if s.tokens == nil {
-		s.tokens = make(Credentials)
+		s.tokens = make(Tokens)
 	}
 	s.tokens[token] = TokenDetails{
 		User:       user,

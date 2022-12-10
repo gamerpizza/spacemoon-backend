@@ -156,12 +156,12 @@ func (f fakeHandler) ServeHTTP(w http.ResponseWriter, _ *http.Request) {
 const serveMessage = "Serving HTTP"
 
 type mockLoginPersistence struct {
-	credentials Credentials
+	credentials Tokens
 }
 
 func (f *mockLoginPersistence) SetUserToken(u User, t Token, d time.Duration) {
 	if f.credentials == nil {
-		f.credentials = make(Credentials)
+		f.credentials = make(Tokens)
 	}
 	f.credentials[t] = TokenDetails{
 		User:       u,

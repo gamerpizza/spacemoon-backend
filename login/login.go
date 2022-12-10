@@ -10,6 +10,8 @@ import (
 type Persistence interface {
 	SetUserToken(user User, token Token, expirationTime time.Duration)
 	GetUser(Token) (User, error)
+	SignUpUser(u User, p Password)
+	ValidateCredentials(u User, p Password) bool
 }
 
 func NewHandler(p Persistence, tokenDuration time.Duration) http.Handler {
@@ -95,3 +97,5 @@ var TokenNotFoundError = errors.New("token not found")
 var ExpiredTokenError = errors.New("expired token")
 
 var DefaultTokenDuration = time.Hour
+
+type Credentials map[User]Password

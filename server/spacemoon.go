@@ -21,8 +21,10 @@ func main() {
 func setupHandlers() {
 	log.Default().Print("registering server handlers...")
 
+	loginPersistence := getLoginPersistence()
 	corsEnabledLoginHandler := cors.EnableCors(login.NewHandler(loginPersistence, time.Hour), http.MethodGet)
 	http.Handle("/login", corsEnabledLoginHandler)
+
 	protector := login.NewProtector(loginPersistence)
 
 	productHandler := product_handler.MakeHandler(getProductPersistence())
