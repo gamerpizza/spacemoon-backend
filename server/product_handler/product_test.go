@@ -25,7 +25,7 @@ func TestHandler_ServeHTTP_Get_OneProduct(t *testing.T) {
 }
 
 func TestHandler_ServeHTTP_Post_Then_Get(t *testing.T) {
-	var fakePersistence Persistence = &fakePersistence{}
+	var fakePersistence product.Persistence = &fakePersistence{}
 	testHandler := MakeHandler(fakePersistence)
 	const productName = "Mars rocks"
 	newProduct, err := product.New(productName, 1, "some description")
@@ -94,7 +94,7 @@ func validateThatSpecificExpectedProductIsRetrieved(t *testing.T, spy spyWriter)
 }
 
 func setUpServeHTTPTest(target string) (http.Handler, *http.Request, spyWriter) {
-	var fakePersistence Persistence = stubPersistence{}
+	var fakePersistence product.Persistence = stubPersistence{}
 	testHandler := MakeHandler(fakePersistence)
 	fakeRequest := httptest.NewRequest(http.MethodGet, target, http.NoBody)
 	spy := spyWriter{}
