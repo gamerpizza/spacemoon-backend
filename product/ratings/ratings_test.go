@@ -39,7 +39,7 @@ func TestProductRater_CalculatesTheMeanRate(t *testing.T) {
 }
 
 func TestProductRater_GetRating_ShouldBeZeroIfEmpty(t *testing.T) {
-	var pr ProductRater = &productRater{}
+	var pr ProductRater = &productRater{persistence: &fakePersistence{}}
 	p, err := product.New("test-product", 1000, "")
 	if err != nil {
 		t.Fatal(err.Error())

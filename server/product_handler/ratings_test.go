@@ -1,14 +1,16 @@
 package product_handler
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"spacemoon/product/ratings"
 	"strings"
 	"testing"
 )
 
 func TestMakeRatingsHandler(t *testing.T) {
-	var h http.Handler = MakeRankingsHandler()
+	var h http.Handler = MakeRankingsHandler(&fakePersistence{})
 
 	spy := spyWriter{}
 	const fakeProductID = "product-id"
@@ -17,7 +19,14 @@ func TestMakeRatingsHandler(t *testing.T) {
 	if spy.header != http.StatusOK {
 		t.Fatalf("unexpected header: %d", spy.header)
 	}
-	if !strings.Contains(spy.written, "Rating: 0") {
+
+	var rating ratings.Rating
+	_ = json.Unmarshal([]byte(strings.TrimSuffix(spy.written, "{written:")), &rating)
+	var expectedRating = ratings.Rating{
+		History: nil,
+		Score:   0,
+	}
+	if rating.Score != expectedRating.Score {
 		t.Fatalf("bad response: %+v", spy)
 	}
 
@@ -27,7 +36,8 @@ func TestMakeRatingsHandler(t *testing.T) {
 	if postSpy.header != http.StatusOK {
 		t.Fatalf("unexpected header: %d", postSpy.header)
 	}
-	if !strings.Contains(postSpy.written, "Rating: 5") {
+	_ = json.Unmarshal([]byte(strings.TrimSuffix(postSpy.written, "{written:")), &rating)
+	if rating.Score != 5 {
 		t.Fatalf("bad response: %+v", postSpy)
 	}
 
@@ -37,7 +47,8 @@ func TestMakeRatingsHandler(t *testing.T) {
 	if postSpy.header != http.StatusOK {
 		t.Fatalf("unexpected header: %d", postSpy.header)
 	}
-	if !strings.Contains(postSpy.written, "Rating: 3") {
+	_ = json.Unmarshal([]byte(strings.TrimSuffix(postSpy.written, "{written:")), &rating)
+	if rating.Score != 3 {
 		t.Fatalf("bad response: %+v", postSpy)
 	}
 }

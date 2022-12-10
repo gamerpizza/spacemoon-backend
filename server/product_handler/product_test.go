@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"spacemoon/product"
+	"spacemoon/product/ratings"
 	"testing"
 )
 
@@ -138,6 +139,18 @@ func (s stubPersistence) DeleteProduct(id product.Id) error {
 
 type fakePersistence struct {
 	savedProducts product.Products
+	ratings       ratings.Ratings
+}
+
+func (f *fakePersistence) ReadRating(id product.Id) ratings.Rating {
+	return f.ratings[id]
+}
+
+func (f *fakePersistence) SaveRating(id product.Id, rating ratings.Rating) {
+	if f.ratings == nil {
+		f.ratings = make(ratings.Ratings)
+	}
+	f.ratings[id] = rating
 }
 
 func (f *fakePersistence) GetProducts() (product.Products, error) {
