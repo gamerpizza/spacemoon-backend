@@ -28,17 +28,13 @@ func TestGetLoginPersistence(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	var mongo login.Persistence = getLoginPersistence()
-	if _, ok := mongo.(*mongoPersistence); !ok {
-		t.Fatal("not the expected persistence")
-	}
 	os.Clearenv()
 }
 
 func TestLoginPersistence(t *testing.T) {
-	persistences := map[string]login.Persistence{"temporary": &temporaryLoginPersistence{}, "mongo": &mongoPersistence{}}
+	persistences := map[string]login.Persistence{"temporary": &temporaryLoginPersistence{}, "mongo": &googleCloudPersistence{}}
 	for k, per := range persistences {
-		var u login.User = "user"
+		var u login.UserName = "user"
 		var p login.Password = "pass"
 		var tok login.Token = "token"
 		per.SignUpUser(u, p)
@@ -70,7 +66,7 @@ func TestGetProductPersistence(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	var mongo product.Persistence = getProductPersistence()
-	if _, ok := mongo.(*mongoPersistence); !ok {
+	if _, ok := mongo.(*googleCloudPersistence); !ok {
 		t.Fatal("not the expected persistence")
 	}
 	os.Clearenv()
@@ -94,7 +90,7 @@ func TestGetProductRatingsPersistence(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	var mongo ratings.Persistence = getProductRatingsPersistence()
-	if _, ok := mongo.(*mongoPersistence); !ok {
+	if _, ok := mongo.(*googleCloudPersistence); !ok {
 		t.Fatal("not the expected persistence")
 	}
 	os.Clearenv()
@@ -118,13 +114,13 @@ func TestGetCategoryPersistence(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	var mongo category.Persistence = getCategoryPersistence()
-	if _, ok := mongo.(*mongoPersistence); !ok {
+	if _, ok := mongo.(*googleCloudPersistence); !ok {
 		t.Fatal("not the expected persistence")
 	}
 	os.Clearenv()
 }
 
-var _ login.Persistence = &mongoPersistence{}
-var _ product.Persistence = &mongoPersistence{}
-var _ ratings.Persistence = &mongoPersistence{}
-var _ category.Persistence = &mongoPersistence{}
+var _ login.Persistence = &googleCloudPersistence{}
+var _ product.Persistence = &googleCloudPersistence{}
+var _ ratings.Persistence = &googleCloudPersistence{}
+var _ category.Persistence = &googleCloudPersistence{}

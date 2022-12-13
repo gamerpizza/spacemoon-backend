@@ -117,7 +117,17 @@ type mockPersistence struct {
 	tokens Tokens
 }
 
-func (s *mockPersistence) SetUserToken(user User, token Token, timeToLive time.Duration) {
+func (s *mockPersistence) SignUpUser(u UserName, p Password) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *mockPersistence) DeleteUser(name UserName) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *mockPersistence) SetUserToken(user UserName, token Token, timeToLive time.Duration) {
 	if s.tokens == nil {
 		s.tokens = make(Tokens)
 	}
@@ -127,7 +137,7 @@ func (s *mockPersistence) SetUserToken(user User, token Token, timeToLive time.D
 	}
 }
 
-func (s *mockPersistence) GetUser(token Token) (User, error) {
+func (s *mockPersistence) GetUser(token Token) (UserName, error) {
 	tokenData, exists := s.tokens[token]
 	if !exists {
 		return "", TokenNotFoundError
@@ -138,7 +148,7 @@ func (s *mockPersistence) GetUser(token Token) (User, error) {
 	return tokenData.User, nil
 }
 
-func (s *mockPersistence) ValidateCredentials(u User, p Password) bool {
+func (s *mockPersistence) ValidateCredentials(u UserName, p Password) bool {
 	if u != expectedUser || p != expectedPass {
 		return false
 	}

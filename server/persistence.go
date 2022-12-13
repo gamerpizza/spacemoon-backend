@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"log"
 	"os"
@@ -8,6 +9,7 @@ import (
 	"spacemoon/product"
 	"spacemoon/product/category"
 	"spacemoon/product/ratings"
+	"spacemoon/server/firestore"
 	"strings"
 	"time"
 )
@@ -17,11 +19,12 @@ func getLoginPersistence() login.Persistence {
 	if checkIfMongoParametersAreNotValid(mongoHost, mongoUsr, mongoPass, "login") {
 		per := &temporaryLoginPersistence{}
 		//hard coded credentials
-		per.users = make(map[login.User]login.Password)
+		per.users = make(map[login.UserName]login.Password)
 		per.users["admin"] = "sp4c3m00n!"
 		return per
 	}
-	return &mongoPersistence{}
+	per, _ := firestore.GetPersistence(context.Background())
+	return per
 }
 
 func getProductPersistence() product.Persistence {
@@ -29,7 +32,7 @@ func getProductPersistence() product.Persistence {
 	if checkIfMongoParametersAreNotValid(mongoHost, mongoUsr, mongoPass, "product") {
 		return &temporaryProductPersistence{}
 	}
-	return &mongoPersistence{}
+	return &googleCloudPersistence{}
 }
 
 func getProductRatingsPersistence() ratings.Persistence {
@@ -37,7 +40,7 @@ func getProductRatingsPersistence() ratings.Persistence {
 	if checkIfMongoParametersAreNotValid(mongoHost, mongoUsr, mongoPass, "ratings") {
 		return &temporaryRatingsPersistence{}
 	}
-	return &mongoPersistence{}
+	return &googleCloudPersistence{}
 }
 
 func getCategoryPersistence() category.Persistence {
@@ -45,63 +48,69 @@ func getCategoryPersistence() category.Persistence {
 	if checkIfMongoParametersAreNotValid(mongoHost, mongoUsr, mongoPass, "category") {
 		return &temporaryCategoryPersistence{}
 	}
-	return &mongoPersistence{}
+	return &googleCloudPersistence{}
 }
 
-type mongoPersistence struct {
+type googleCloudPersistence struct {
 }
 
-func (m *mongoPersistence) SignUpUser(_ login.User, _ login.Password) {
+func (m *googleCloudPersistence) SignUpUser(_ login.UserName, _ login.Password) error {
+	return nil
 }
 
-func (m *mongoPersistence) SetUserToken(_ login.User, _ login.Token, _ time.Duration) {
+func (m *googleCloudPersistence) DeleteUser(name login.UserName) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *googleCloudPersistence) SetUserToken(_ login.UserName, _ login.Token, _ time.Duration) {
 
 }
 
-func (m *mongoPersistence) GetUser(_ login.Token) (login.User, error) {
+func (m *googleCloudPersistence) GetUser(_ login.Token) (login.UserName, error) {
 	return "", nil
 }
 
-func (m *mongoPersistence) ValidateCredentials(_ login.User, _ login.Password) bool {
+func (m *googleCloudPersistence) ValidateCredentials(_ login.UserName, _ login.Password) bool {
 	return false
 }
 
-func (m *mongoPersistence) GetCategories() category.Categories {
+func (m *googleCloudPersistence) GetCategories() category.Categories {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (m *mongoPersistence) SaveCategory(dto category.DTO) {
+func (m *googleCloudPersistence) SaveCategory(dto category.DTO) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (m *mongoPersistence) DeleteCategory(name category.Name) {
+func (m *googleCloudPersistence) DeleteCategory(name category.Name) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (m *mongoPersistence) ReadRating(id product.Id) ratings.Rating {
+func (m *googleCloudPersistence) ReadRating(id product.Id) ratings.Rating {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (m *mongoPersistence) SaveRating(id product.Id, rating ratings.Rating) {
+func (m *googleCloudPersistence) SaveRating(id product.Id, rating ratings.Rating) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (m *mongoPersistence) GetProducts() (product.Products, error) {
+func (m *googleCloudPersistence) GetProducts() (product.Products, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (m *mongoPersistence) SaveProduct(p product.Product) error {
+func (m *googleCloudPersistence) SaveProduct(p product.Product) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (m *mongoPersistence) DeleteProduct(id product.Id) error {
+func (m *googleCloudPersistence) DeleteProduct(id product.Id) error {
 	//TODO implement me
 	panic("implement me")
 }
@@ -164,18 +173,23 @@ func (t *temporaryCategoryPersistence) GetCategories() category.Categories {
 }
 
 type temporaryLoginPersistence struct {
-	users  login.Credentials
+	users  Credentials
 	tokens login.Tokens
 }
 
-func (t *temporaryLoginPersistence) ValidateCredentials(usr login.User, p login.Password) bool {
+func (t *temporaryLoginPersistence) DeleteUser(name login.UserName) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (t *temporaryLoginPersistence) ValidateCredentials(usr login.UserName, p login.Password) bool {
 	if t.users[usr] == p {
 		return true
 	}
 	return false
 }
 
-func (t *temporaryLoginPersistence) GetUser(token login.Token) (login.User, error) {
+func (t *temporaryLoginPersistence) GetUser(token login.Token) (login.UserName, error) {
 	tokenInfo, exists := t.tokens[token]
 	if !exists {
 		return "", errors.New("token not found")
@@ -187,7 +201,7 @@ func (t *temporaryLoginPersistence) GetUser(token login.Token) (login.User, erro
 	return tokenInfo.User, nil
 }
 
-func (t *temporaryLoginPersistence) SetUserToken(user login.User, token login.Token, tokenDuration time.Duration) {
+func (t *temporaryLoginPersistence) SetUserToken(user login.UserName, token login.Token, tokenDuration time.Duration) {
 	if t.tokens == nil {
 		t.tokens = make(login.Tokens)
 	}
@@ -197,11 +211,12 @@ func (t *temporaryLoginPersistence) SetUserToken(user login.User, token login.To
 	}
 }
 
-func (t *temporaryLoginPersistence) SignUpUser(u login.User, p login.Password) {
+func (t *temporaryLoginPersistence) SignUpUser(u login.UserName, p login.Password) error {
 	if t.users == nil {
-		t.users = make(login.Credentials)
+		t.users = make(Credentials)
 	}
 	t.users[u] = p
+	return nil
 }
 
 type temporaryRatingsPersistence struct {
@@ -222,3 +237,5 @@ func (t *temporaryRatingsPersistence) SaveRating(id product.Id, rating ratings.R
 const mongoHostKey = "MONGO_HOST"
 const mongoUserNameKey = "MONGO_USER"
 const mongoPasswordKey = "MONGO_PASS"
+
+type Credentials map[login.UserName]login.Password
