@@ -12,7 +12,7 @@ import (
 
 // Persistence defines how the login/protector combo saves authorization information
 type Persistence interface {
-	SetUserToken(user UserName, token Token, expirationTime time.Duration)
+	SetUserToken(UserName, Token, time.Duration) error
 	GetUser(Token) (UserName, error)
 	SignUpUser(u UserName, p Password) error
 	ValidateCredentials(u UserName, p Password) bool

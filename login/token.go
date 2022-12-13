@@ -35,6 +35,10 @@ func (t tokenGenerator) NewToken(size int) Token {
 
 }
 
+type Credential struct {
+	Token
+	TokenDetails
+}
 type Token string
 type TokenDetails struct {
 	User       UserName

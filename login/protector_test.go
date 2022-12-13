@@ -131,9 +131,10 @@ func (s stubTokenLoginPersistence) DeleteUser(name UserName) error {
 	panic("implement me")
 }
 
-func (s stubTokenLoginPersistence) SetUserToken(user UserName, token Token, expirationTime time.Duration) {
+func (s stubTokenLoginPersistence) SetUserToken(user UserName, token Token, expirationTime time.Duration) error {
 	//TODO implement me
 	panic("implement me")
+	return nil
 }
 
 func (s stubTokenLoginPersistence) GetUser(t Token) (UserName, error) {
@@ -189,7 +190,7 @@ func (f *mockLoginPersistence) DeleteUser(name UserName) error {
 	panic("implement me")
 }
 
-func (f *mockLoginPersistence) SetUserToken(u UserName, t Token, d time.Duration) {
+func (f *mockLoginPersistence) SetUserToken(user UserName, token Token, expirationTime time.Duration) error {
 	if f.credentials == nil {
 		f.credentials = make(Tokens)
 	}
@@ -197,6 +198,7 @@ func (f *mockLoginPersistence) SetUserToken(u UserName, t Token, d time.Duration
 		User:       u,
 		Expiration: time.Now().Add(d),
 	}
+	return nil
 }
 
 func (f *mockLoginPersistence) GetUser(t Token) (UserName, error) {

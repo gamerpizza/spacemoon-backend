@@ -127,7 +127,7 @@ func (s *mockPersistence) DeleteUser(name UserName) error {
 	panic("implement me")
 }
 
-func (s *mockPersistence) SetUserToken(user UserName, token Token, timeToLive time.Duration) {
+func (s *mockPersistence) SetUserToken(user UserName, token Token, expirationTime time.Duration) error {
 	if s.tokens == nil {
 		s.tokens = make(Tokens)
 	}
@@ -135,6 +135,7 @@ func (s *mockPersistence) SetUserToken(user UserName, token Token, timeToLive ti
 		User:       user,
 		Expiration: time.Now().Add(timeToLive),
 	}
+	return nil
 }
 
 func (s *mockPersistence) GetUser(token Token) (UserName, error) {

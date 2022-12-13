@@ -10,27 +10,6 @@ import (
 	"time"
 )
 
-func TestGetLoginPersistence(t *testing.T) {
-	var temp login.Persistence = getLoginPersistence()
-	if _, ok := temp.(*temporaryLoginPersistence); !ok {
-		t.Fatal("not the expected persistence")
-	}
-
-	err := os.Setenv(mongoHostKey, "host")
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	err = os.Setenv(mongoUserNameKey, "user")
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	err = os.Setenv(mongoPasswordKey, "pass")
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	os.Clearenv()
-}
-
 func TestLoginPersistence(t *testing.T) {
 	persistences := map[string]login.Persistence{"temporary": &temporaryLoginPersistence{}, "mongo": &googleCloudPersistence{}}
 	for k, per := range persistences {

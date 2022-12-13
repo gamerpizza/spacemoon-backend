@@ -2,7 +2,6 @@ package firestore
 
 import (
 	"context"
-	"os"
 	"spacemoon/login"
 	"spacemoon/product"
 	"spacemoon/product/category"
@@ -12,16 +11,6 @@ import (
 
 func TestGetPersistence(t *testing.T) {
 	ctx := context.TODO()
-
-	err := os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "/home/hari/Dev/spacemoon/spacemoon-backend/server/firestore/global-pagoda-368419-1b8a2cf2d395.json")
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	lp, err := GetPersistence(ctx)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	lp.ValidateCredentials("", "")
 
 	var pp product.Persistence
 	pp, _ = GetPersistence(ctx)
@@ -60,11 +49,32 @@ func TestLoginPersistence(t *testing.T) {
 		t.Fatal("expected user not found")
 	}
 
+	const testToken = "test-token"
+	err = lp.SetUserToken(testUser, testToken, login.DefaultTokenDuration)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	username, err := lp.GetUser(testToken)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	if username != testUser {
+		t.Fatal("retrieved user does not match expected user")
+	}
+
 	err = lp.DeleteUser(testUser)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
 	if lp.ValidateCredentials(testUser, testPassword) {
 		t.Fatal("unexpected user found")
+	}
+	err = lp.(*fireStorePersistence).DeleteToken(testToken)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	_, err = lp.GetUser(testToken)
+	if err == nil {
+		t.Fatal("did not erase token")
 	}
 }

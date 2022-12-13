@@ -66,14 +66,42 @@ func (p *fireStorePersistence) SaveRating(id product.Id, rating ratings.Rating) 
 	panic("implement me")
 }
 
-func (p *fireStorePersistence) SetUserToken(user login.UserName, token login.Token, expirationTime time.Duration) {
-	//TODO implement me
-	panic("implement me")
+func (p *fireStorePersistence) SetUserToken(user login.UserName, token login.Token, duration time.Duration) error {
+	collection := p.storage.Collection(loginTokensCollection)
+	_, err := collection.Doc(string(token)).Set(p.ctx, login.Credential{
+		Token: token,
+		TokenDetails: login.TokenDetails{
+			User:       user,
+			Expiration: time.Now().Add(duration),
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("could not ser user token: %w", err)
+	}
+	return nil
 }
 
 func (p *fireStorePersistence) GetUser(token login.Token) (login.UserName, error) {
-	//TODO implement me
-	panic("implement me")
+	collection := p.storage.Collection(loginTokensCollection)
+	get, err := collection.Doc(string(token)).Get(p.ctx)
+	if err != nil {
+		return "", fmt.Errorf("could not get token from persistence: %w", err)
+	}
+	var cred login.Credential
+	err = get.DataTo(&cred)
+	if err != nil {
+		return "", fmt.Errorf("could not parse data from persistence: %w", err)
+	}
+	return cred.User, nil
+}
+
+func (p *fireStorePersistence) DeleteToken(tk login.Token) error {
+	collection := p.storage.Collection(loginTokensCollection)
+	_, err := collection.Doc(string(tk)).Delete(p.ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *fireStorePersistence) SignUpUser(u login.UserName, pass login.Password) error {
@@ -135,3 +163,4 @@ func (p *fireStorePersistence) DeleteProduct(id product.Id) error {
 }
 
 const loginCollection = "login"
+const loginTokensCollection = "login-tokens"

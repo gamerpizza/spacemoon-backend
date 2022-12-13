@@ -63,8 +63,9 @@ func (m *googleCloudPersistence) DeleteUser(name login.UserName) error {
 	panic("implement me")
 }
 
-func (m *googleCloudPersistence) SetUserToken(_ login.UserName, _ login.Token, _ time.Duration) {
+func (m *googleCloudPersistence) SetUserToken(user login.UserName, token login.Token, expirationTime time.Duration) error {
 
+	return nil
 }
 
 func (m *googleCloudPersistence) GetUser(_ login.Token) (login.UserName, error) {
@@ -201,7 +202,7 @@ func (t *temporaryLoginPersistence) GetUser(token login.Token) (login.UserName, 
 	return tokenInfo.User, nil
 }
 
-func (t *temporaryLoginPersistence) SetUserToken(user login.UserName, token login.Token, tokenDuration time.Duration) {
+func (t *temporaryLoginPersistence) SetUserToken(user login.UserName, token login.Token, expirationTime time.Duration) error {
 	if t.tokens == nil {
 		t.tokens = make(login.Tokens)
 	}
@@ -209,6 +210,7 @@ func (t *temporaryLoginPersistence) SetUserToken(user login.UserName, token logi
 		User:       user,
 		Expiration: time.Now().Add(tokenDuration),
 	}
+	return nil
 }
 
 func (t *temporaryLoginPersistence) SignUpUser(u login.UserName, p login.Password) error {
