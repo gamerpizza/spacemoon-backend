@@ -1,6 +1,7 @@
 package product_handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"spacemoon/product"
@@ -8,8 +9,8 @@ import (
 	"strconv"
 )
 
-func MakeRankingsHandler() http.Handler {
-	return &rankingsHandler{rater: ratings.NewProductRater()}
+func MakeRankingsHandler(p ratings.Persistence) http.Handler {
+	return &rankingsHandler{rater: ratings.NewProductRater(p)}
 }
 
 type rankingsHandler struct {
@@ -31,8 +32,8 @@ func (rh *rankingsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			_, _ = w.Write([]byte("could not post rating: " + err.Error()))
 		}
 		w.WriteHeader(http.StatusOK)
-		rh.rater.AddRating(product.Id(productId), ratings.Rating(rating))
-		_, _ = w.Write([]byte(fmt.Sprintf("Rating: %d", rh.rater.GetRating(product.Id(productId)))))
+		rh.rater.AddRating(product.Id(productId), ratings.Score(rating))
+		_ = json.NewEncoder(w).Encode(rh.rater.GetRating(product.Id(productId)))
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}

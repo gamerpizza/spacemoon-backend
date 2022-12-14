@@ -8,20 +8,13 @@ import (
 
 // MakeHandler creates a product handler and attributes it a Persistence. This is made to allow the Persistence
 // implementation to be easily changed dynamically.
-func MakeHandler(p Persistence) http.Handler {
+func MakeHandler(p product.Persistence) http.Handler {
 	return &handler{persistence: p}
-}
-
-// Persistence is used, as expected, to write and read, to be able to save information.
-type Persistence interface {
-	GetProducts() (product.Products, error)
-	SaveProduct(product.Product) error
-	DeleteProduct(product.Id) error
 }
 
 // handler handles all the calls to the server's product API
 type handler struct {
-	persistence Persistence
+	persistence product.Persistence
 	writer      http.ResponseWriter
 	request     *http.Request
 }

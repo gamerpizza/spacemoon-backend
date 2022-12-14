@@ -57,3 +57,9 @@ type Name string
 type Categories map[Name]DTO
 
 var EmptyNameError = errors.New("category name cannot be empty")
+
+type Persistence interface {
+	GetCategories() Categories
+	SaveCategory(DTO)
+	DeleteCategory(Name)
+}

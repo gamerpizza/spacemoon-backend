@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"spacemoon/product"
+	"spacemoon/product/ratings"
 	"testing"
 )
 
@@ -24,7 +25,7 @@ func TestHandler_ServeHTTP_Get_OneProduct(t *testing.T) {
 }
 
 func TestHandler_ServeHTTP_Post_Then_Get(t *testing.T) {
-	var fakePersistence Persistence = &fakePersistence{}
+	var fakePersistence product.Persistence = &fakePersistence{}
 	testHandler := MakeHandler(fakePersistence)
 	const productName = "Mars rocks"
 	newProduct, err := product.New(productName, 1, "some description")
@@ -93,7 +94,7 @@ func validateThatSpecificExpectedProductIsRetrieved(t *testing.T, spy spyWriter)
 }
 
 func setUpServeHTTPTest(target string) (http.Handler, *http.Request, spyWriter) {
-	var fakePersistence Persistence = stubPersistence{}
+	var fakePersistence product.Persistence = stubPersistence{}
 	testHandler := MakeHandler(fakePersistence)
 	fakeRequest := httptest.NewRequest(http.MethodGet, target, http.NoBody)
 	spy := spyWriter{}
@@ -138,6 +139,18 @@ func (s stubPersistence) DeleteProduct(id product.Id) error {
 
 type fakePersistence struct {
 	savedProducts product.Products
+	ratings       ratings.Ratings
+}
+
+func (f *fakePersistence) ReadRating(id product.Id) ratings.Rating {
+	return f.ratings[id]
+}
+
+func (f *fakePersistence) SaveRating(id product.Id, rating ratings.Rating) {
+	if f.ratings == nil {
+		f.ratings = make(ratings.Ratings)
+	}
+	f.ratings[id] = rating
 }
 
 func (f *fakePersistence) GetProducts() (product.Products, error) {

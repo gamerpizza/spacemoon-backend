@@ -35,13 +35,17 @@ func (t tokenGenerator) NewToken(size int) Token {
 
 }
 
+type Credential struct {
+	Token
+	TokenDetails
+}
 type Token string
 type TokenDetails struct {
-	User       User
+	User       UserName
 	Expiration time.Time
 }
 
-type Credentials map[Token]TokenDetails
+type Tokens map[Token]TokenDetails
 
 // TokenCharacters defines the characters that can be used to generate a token
 const TokenCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_~"
