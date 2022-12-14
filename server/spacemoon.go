@@ -21,18 +21,20 @@ func main() {
 func setupHandlers() {
 	log.Default().Print("registering server handlers...")
 
+	loginPersistence := getLoginPersistence()
 	corsEnabledLoginHandler := cors.EnableCors(login.NewHandler(loginPersistence, time.Hour), http.MethodGet)
 	http.Handle("/login", corsEnabledLoginHandler)
+
 	protector := login.NewProtector(loginPersistence)
 
-	productHandler := product_handler.MakeHandler(&temporaryProductPersistence{})
+	productHandler := product_handler.MakeHandler(getProductPersistence())
 	preparedProductHandler := prepareHandler(protector, productHandler, http.MethodGet)
 	http.Handle("/product", preparedProductHandler)
-	productRatingHandler := product_handler.MakeRankingsHandler()
+	productRatingHandler := product_handler.MakeRankingsHandler(getProductRatingsPersistence())
 	preparedProductRatingHandler := prepareHandler(protector, productRatingHandler, http.MethodGet)
 	http.Handle("/product/rating", preparedProductRatingHandler)
 
-	categoryHandler := category_handler.MakeHandler(&temporaryCategoryPersistence{})
+	categoryHandler := category_handler.MakeHandler(getCategoryPersistence())
 	preparedCategoryHandler := prepareHandler(protector, categoryHandler, http.MethodGet)
 	http.Handle("/category", preparedCategoryHandler)
 

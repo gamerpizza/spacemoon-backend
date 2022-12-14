@@ -1,48 +1,51 @@
 package ratings
 
-import "spacemoon/product"
+import (
+	"spacemoon/product"
+)
+
+type Persistence interface {
+	ReadRating(product.Id) Rating
+	SaveRating(product.Id, Rating)
+}
 
 // NewProductRater creates a new ProductRater to rate a set of product.Product
-func NewProductRater() ProductRater {
-	return &productRater{}
+func NewProductRater(p Persistence) ProductRater {
+	return &productRater{persistence: p}
 }
 
 type ProductRater interface {
-	AddRating(product.Id, Rating)
+	AddRating(product.Id, Score)
 	GetRating(product.Id) Rating
 }
 
 type productRater struct {
-	ratings ratings
+	persistence Persistence
 }
 
 func (pr *productRater) GetRating(p product.Id) Rating {
-	return pr.ratings[p].finalRating
+	return pr.persistence.ReadRating(p)
 }
 
-func (pr *productRater) AddRating(p product.Id, r Rating) {
-	if pr.ratings == nil {
-		pr.ratings = make(ratings)
-	}
-	productRating := pr.ratings[p]
+func (pr *productRater) AddRating(p product.Id, r Score) {
+	productRating := pr.persistence.ReadRating(p)
 	newFinalRating := calculateNewFinalRating(productRating, r)
-	productRating.ratingHistory = append(pr.ratings[p].ratingHistory, r)
-	productRating.finalRating = Rating(newFinalRating)
-
-	pr.ratings[p] = productRating
+	productRating.History = append(pr.persistence.ReadRating(p).History, r)
+	productRating.Score = Score(newFinalRating)
+	pr.persistence.SaveRating(p, productRating)
 }
 
-func calculateNewFinalRating(oldRating rating, newValue Rating) int {
-	amountOfRatingsForProduct := len(oldRating.ratingHistory)
-	lastProductRating := int(oldRating.finalRating)
-	newRating := (int(newValue) + lastProductRating*amountOfRatingsForProduct) / (amountOfRatingsForProduct + 1)
+func calculateNewFinalRating(old Rating, new Score) int {
+	amountOfRatingsForProduct := len(old.History)
+	lastProductRating := int(old.Score)
+	newRating := (int(new) + lastProductRating*amountOfRatingsForProduct) / (amountOfRatingsForProduct + 1)
 	return newRating
 }
 
-type Rating uint
-
-type ratings map[product.Id]rating
-type rating struct {
-	ratingHistory []Rating
-	finalRating   Rating
+type Ratings map[product.Id]Rating
+type Rating struct {
+	History []Score
+	Score   Score
 }
+
+type Score int

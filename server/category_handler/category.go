@@ -9,18 +9,12 @@ import (
 	"strings"
 )
 
-type Persistence interface {
-	GetCategories() category.Categories
-	SaveCategory(category.DTO)
-	DeleteCategory(category.Name)
-}
-
-func MakeHandler(p Persistence) http.Handler {
+func MakeHandler(p category.Persistence) http.Handler {
 	return handler{persistence: p}
 }
 
 type handler struct {
-	persistence Persistence
+	persistence category.Persistence
 	writer      http.ResponseWriter
 	request     *http.Request
 }

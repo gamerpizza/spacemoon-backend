@@ -103,3 +103,10 @@ type Products map[Id]Dto
 
 // EmptyNameError is returned when trying to create a product with an empty name.
 var EmptyNameError = errors.New("name cannot be empty")
+
+// Persistence is used, as expected, to write and read, to be able to save information.
+type Persistence interface {
+	GetProducts() (Products, error)
+	SaveProduct(Product) error
+	DeleteProduct(Id) error
+}

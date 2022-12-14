@@ -116,12 +116,28 @@ func loginExpectedUser(t *testing.T, fakePersistence Persistence) string {
 type stubTokenLoginPersistence struct {
 }
 
-func (s stubTokenLoginPersistence) SetUserToken(user User, token Token, expirationTime time.Duration) {
+func (s stubTokenLoginPersistence) SignUpUser(u UserName, p Password) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s stubTokenLoginPersistence) GetUser(t Token) (User, error) {
+func (s stubTokenLoginPersistence) ValidateCredentials(u UserName, p Password) bool {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s stubTokenLoginPersistence) DeleteUser(name UserName) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s stubTokenLoginPersistence) SetUserToken(user UserName, token Token, expirationTime time.Duration) error {
+	//TODO implement me
+	panic("implement me")
+	return nil
+}
+
+func (s stubTokenLoginPersistence) GetUser(t Token) (UserName, error) {
 	if t == expectedToken {
 		return expectedUser, nil
 	}
@@ -156,20 +172,36 @@ func (f fakeHandler) ServeHTTP(w http.ResponseWriter, _ *http.Request) {
 const serveMessage = "Serving HTTP"
 
 type mockLoginPersistence struct {
-	credentials Credentials
+	credentials Tokens
 }
 
-func (f *mockLoginPersistence) SetUserToken(u User, t Token, d time.Duration) {
+func (f *mockLoginPersistence) SignUpUser(u UserName, p Password) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f *mockLoginPersistence) ValidateCredentials(u UserName, p Password) bool {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f *mockLoginPersistence) DeleteUser(name UserName) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f *mockLoginPersistence) SetUserToken(user UserName, token Token, expirationTime time.Duration) error {
 	if f.credentials == nil {
-		f.credentials = make(Credentials)
+		f.credentials = make(Tokens)
 	}
 	f.credentials[t] = TokenDetails{
 		User:       u,
 		Expiration: time.Now().Add(d),
 	}
+	return nil
 }
 
-func (f *mockLoginPersistence) GetUser(t Token) (User, error) {
+func (f *mockLoginPersistence) GetUser(t Token) (UserName, error) {
 	details, exist := f.credentials[t]
 	if !exist {
 		return "", TokenNotFoundError
