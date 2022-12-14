@@ -3,20 +3,23 @@ package product_handler
 
 import (
 	"net/http"
+	"spacemoon/login"
 	"spacemoon/product"
+	"strings"
 )
 
 // MakeHandler creates a product handler and attributes it a Persistence. This is made to allow the Persistence
 // implementation to be easily changed dynamically.
-func MakeHandler(p product.Persistence) http.Handler {
-	return &handler{persistence: p}
+func MakeHandler(pp product.Persistence, lp login.Persistence) http.Handler {
+	return &handler{productPersistence: pp, loginPersistence: lp}
 }
 
 // handler handles all the calls to the server's product API
 type handler struct {
-	persistence product.Persistence
-	writer      http.ResponseWriter
-	request     *http.Request
+	productPersistence product.Persistence
+	writer             http.ResponseWriter
+	request            *http.Request
+	loginPersistence   login.Persistence
 }
 
 // ServeHTTP will handle the request according to the http method. For http.MethodPost, it will create a new product.
@@ -55,7 +58,7 @@ func (h *handler) createProduct() {
 		_, _ = h.writer.Write([]byte(err.Error()))
 		return
 	}
-	existingProducts, err := h.persistence.GetProducts()
+	existingProducts, err := h.productPersistence.GetProducts()
 	if err != nil {
 		h.writer.WriteHeader(http.StatusInternalServerError)
 		_, _ = h.writer.Write([]byte(err.Error()))
@@ -67,13 +70,21 @@ func (h *handler) createProduct() {
 		_, _ = h.writer.Write([]byte("a product with that Id already exists"))
 		return
 	}
-	createdProduct, err := product.New(newProduct.Name, newProduct.Price, newProduct.Description)
+	bearer := h.request.Header.Get("Authorization")
+	token := login.Token(strings.TrimPrefix(bearer, "Bearer "))
+	user, err := h.loginPersistence.GetUser(token)
+	if err != nil {
+		h.writer.WriteHeader(http.StatusInternalServerError)
+		_, _ = h.writer.Write([]byte(err.Error()))
+		return
+	}
+	createdProduct, err := product.New(newProduct.Name, newProduct.Price, newProduct.Description, user)
 	if err != nil {
 		h.writer.WriteHeader(http.StatusBadRequest)
 		_, _ = h.writer.Write([]byte(err.Error()))
 		return
 	}
-	err = h.persistence.SaveProduct(createdProduct)
+	err = h.productPersistence.SaveProduct(createdProduct)
 	if err != nil {
 		h.writer.WriteHeader(http.StatusInternalServerError)
 		_, _ = h.writer.Write([]byte(err.Error()))
@@ -93,7 +104,7 @@ func (h *handler) deleteProduct() {
 		_, _ = h.writer.Write([]byte("you did not specify the Id of the item to be deleted"))
 		return
 	}
-	existingProducts, err := h.persistence.GetProducts()
+	existingProducts, err := h.productPersistence.GetProducts()
 	if err != nil {
 		h.writer.WriteHeader(http.StatusInternalServerError)
 		_, _ = h.writer.Write([]byte(err.Error()))
@@ -105,7 +116,7 @@ func (h *handler) deleteProduct() {
 		_, _ = h.writer.Write([]byte("product not found"))
 		return
 	}
-	err = h.persistence.DeleteProduct(productId)
+	err = h.productPersistence.DeleteProduct(productId)
 	if err != nil {
 		h.writer.WriteHeader(http.StatusInternalServerError)
 		_, _ = h.writer.Write([]byte(err.Error()))

@@ -190,7 +190,7 @@ func (f *mockLoginPersistence) DeleteUser(name UserName) error {
 	panic("implement me")
 }
 
-func (f *mockLoginPersistence) SetUserToken(user UserName, token Token, expirationTime time.Duration) error {
+func (f *mockLoginPersistence) SetUserToken(u UserName, t Token, d time.Duration) error {
 	if f.credentials == nil {
 		f.credentials = make(Tokens)
 	}

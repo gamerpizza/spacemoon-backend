@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"spacemoon/login"
 	"strings"
 )
 
@@ -12,7 +13,7 @@ import (
 // the rating of the product is a complex responsibility by itself, it makes sense to have a Rater somewhere else,
 // and leave the rating out of the product itself.
 // If the provided Name for the new Product is empty, New will return nil and an error.
-func New(n Name, p Price, d Description) (Product, error) {
+func New(n Name, p Price, d Description, seller login.UserName) (Product, error) {
 	if strings.TrimSpace(string(n)) == "" {
 		return nil, EmptyNameError
 	}
@@ -25,6 +26,7 @@ func New(n Name, p Price, d Description) (Product, error) {
 		Price:       p,
 		Description: d,
 		Id:          Id(id.String()),
+		Seller:      seller,
 	}, nil
 }
 
@@ -41,11 +43,12 @@ type Product interface {
 
 // Dto is a representation of a product, with a given Price, Name, Rating and Description, used for data transfer.
 type Dto struct {
-	Name        Name        `json:"name"`
-	Price       Price       `json:"price"`
-	Description Description `json:"description"`
-	Id          Id          `json:"id"`
-	Type        Type        `json:"type"`
+	Name        Name           `json:"name"`
+	Price       Price          `json:"price"`
+	Description Description    `json:"description"`
+	Id          Id             `json:"id"`
+	Type        Type           `json:"type"`
+	Seller      login.UserName `json:"seller"`
 }
 
 func (d *Dto) SetType(t Type) {
