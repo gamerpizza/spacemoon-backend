@@ -21,6 +21,10 @@ Right now, it is using PORT 1234 to receive the requests.
 * Instant Pay payment processing
 * Google Pay payment processing
 
+##  [v0.5.0] - _2022 12 14_
+### Added
+* Product seller based on the user adding the product
+
 ##  [v0.4.0] - _2022 12 14_
 ### Added
 * Login and Product Persistence
