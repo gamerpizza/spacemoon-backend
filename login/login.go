@@ -4,6 +4,7 @@
 package login
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strings"
@@ -46,6 +47,8 @@ func (h *handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	switch request.Method {
 	case http.MethodGet:
 		h.login()
+	case http.MethodPost:
+		h.signup()
 	default:
 		writer.WriteHeader(http.StatusMethodNotAllowed)
 	}
@@ -64,8 +67,31 @@ func (h *handler) login() {
 	}
 	newToken := NewTokenGenerator().NewToken(UseDefaultSize)
 
-	h.persistence.SetUserToken(UserName(user), newToken, h.tokenExpirationTime)
+	err := h.persistence.SetUserToken(UserName(user), newToken, h.tokenExpirationTime)
+	if err != nil {
+		h.writer.WriteHeader(http.StatusInternalServerError)
+		_, _ = h.writer.Write([]byte(err.Error()))
+		return
+	}
 	h.respondWithAccessToken(newToken)
+}
+
+func (h *handler) signup() {
+	decoder := json.NewDecoder(h.request.Body)
+	var u User
+	err := decoder.Decode(&u)
+	if err != nil {
+		h.writer.WriteHeader(http.StatusBadRequest)
+		_, _ = h.writer.Write([]byte(err.Error()))
+		return
+	}
+	err = h.persistence.SignUpUser(u.UserName, u.Password)
+	if err != nil {
+		h.writer.WriteHeader(http.StatusInternalServerError)
+		_, _ = h.writer.Write([]byte(err.Error()))
+		return
+	}
+	h.writer.WriteHeader(http.StatusNoContent)
 }
 
 func (h *handler) respondWithAccessToken(token Token) {

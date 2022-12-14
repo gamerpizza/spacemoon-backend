@@ -15,122 +15,46 @@ import (
 )
 
 func getLoginPersistence() login.Persistence {
-	mongoHost, mongoUsr, mongoPass := getMongoEnvironmentVariables()
-	if checkIfMongoParametersAreNotValid(mongoHost, mongoUsr, mongoPass, "login") {
-		per := &temporaryLoginPersistence{}
-		//hard coded credentials
-		per.users = make(map[login.UserName]login.Password)
-		per.users["admin"] = "sp4c3m00n!"
-		return per
+	creds := os.Getenv(googleCredentials)
+	if strings.TrimSpace(creds) == "" {
+		log.Default().Print("using temporary (dev) login persistence - no google credentials file set")
+		return makeTemporaryLoginPersistence()
 	}
-	per, _ := firestore.GetPersistence(context.Background())
+	per, err := firestore.GetPersistence(context.Background())
+	if err != nil {
+		log.Default().Printf("using temporary (dev) login persistence - error getting firestore persistence: %s", err.Error())
+		return makeTemporaryLoginPersistence()
+	}
 	return per
 }
 
-func getProductPersistence() product.Persistence {
-	mongoHost, mongoUsr, mongoPass := getMongoEnvironmentVariables()
-	if checkIfMongoParametersAreNotValid(mongoHost, mongoUsr, mongoPass, "product") {
-		return &temporaryProductPersistence{}
+func makeTemporaryLoginPersistence() login.Persistence {
+	return &temporaryLoginPersistence{
+		users:  Credentials{},
+		tokens: login.Tokens{},
 	}
-	return &googleCloudPersistence{}
+}
+
+func getProductPersistence() product.Persistence {
+	creds := os.Getenv(googleCredentials)
+	if strings.TrimSpace(creds) == "" {
+		log.Default().Print("using temporary (dev) product persistence - no google credentials file set")
+		return &temporaryProductPersistence{savedProducts: map[product.Id]product.Dto{}}
+	}
+	per, err := firestore.GetPersistence(context.Background())
+	if err != nil {
+		log.Default().Printf("using temporary (dev) product persistence - error getting firestore persistence: %s", err.Error())
+		return &temporaryProductPersistence{savedProducts: map[product.Id]product.Dto{}}
+	}
+	return per
 }
 
 func getProductRatingsPersistence() ratings.Persistence {
-	mongoHost, mongoUsr, mongoPass := getMongoEnvironmentVariables()
-	if checkIfMongoParametersAreNotValid(mongoHost, mongoUsr, mongoPass, "ratings") {
-		return &temporaryRatingsPersistence{}
-	}
-	return &googleCloudPersistence{}
+	return &temporaryRatingsPersistence{r: map[product.Id]ratings.Rating{}}
 }
 
 func getCategoryPersistence() category.Persistence {
-	mongoHost, mongoUsr, mongoPass := getMongoEnvironmentVariables()
-	if checkIfMongoParametersAreNotValid(mongoHost, mongoUsr, mongoPass, "category") {
-		return &temporaryCategoryPersistence{}
-	}
-	return &googleCloudPersistence{}
-}
-
-type googleCloudPersistence struct {
-}
-
-func (m *googleCloudPersistence) SignUpUser(_ login.UserName, _ login.Password) error {
-	return nil
-}
-
-func (m *googleCloudPersistence) DeleteUser(name login.UserName) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m *googleCloudPersistence) SetUserToken(user login.UserName, token login.Token, expirationTime time.Duration) error {
-
-	return nil
-}
-
-func (m *googleCloudPersistence) GetUser(_ login.Token) (login.UserName, error) {
-	return "", nil
-}
-
-func (m *googleCloudPersistence) ValidateCredentials(_ login.UserName, _ login.Password) bool {
-	return false
-}
-
-func (m *googleCloudPersistence) GetCategories() category.Categories {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m *googleCloudPersistence) SaveCategory(dto category.DTO) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m *googleCloudPersistence) DeleteCategory(name category.Name) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m *googleCloudPersistence) ReadRating(id product.Id) ratings.Rating {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m *googleCloudPersistence) SaveRating(id product.Id, rating ratings.Rating) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m *googleCloudPersistence) GetProducts() (product.Products, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m *googleCloudPersistence) SaveProduct(p product.Product) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (m *googleCloudPersistence) DeleteProduct(id product.Id) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func checkIfMongoParametersAreNotValid(mongoHost, mongoUsr, mongoPass, persistenceType string) bool {
-	isInvalid := strings.TrimSpace(mongoHost) == "" || strings.TrimSpace(mongoUsr) == "" || strings.TrimSpace(mongoPass) == ""
-	if isInvalid {
-		log.Default().Printf("using temporary persistence for %s", persistenceType)
-		return isInvalid
-	}
-	log.Default().Printf("using mongo persistence for %s", persistenceType)
-	return isInvalid
-}
-
-func getMongoEnvironmentVariables() (string, string, string) {
-	mongoHost := os.Getenv(mongoHostKey)
-	mongoUsr := os.Getenv(mongoUserNameKey)
-	mongoPass := os.Getenv(mongoPasswordKey)
-	return mongoHost, mongoUsr, mongoPass
+	return &temporaryCategoryPersistence{categories: map[category.Name]category.DTO{}}
 }
 
 type temporaryProductPersistence struct {
@@ -202,7 +126,7 @@ func (t *temporaryLoginPersistence) GetUser(token login.Token) (login.UserName, 
 	return tokenInfo.User, nil
 }
 
-func (t *temporaryLoginPersistence) SetUserToken(user login.UserName, token login.Token, expirationTime time.Duration) error {
+func (t *temporaryLoginPersistence) SetUserToken(user login.UserName, token login.Token, tokenDuration time.Duration) error {
 	if t.tokens == nil {
 		t.tokens = make(login.Tokens)
 	}
@@ -236,8 +160,6 @@ func (t *temporaryRatingsPersistence) SaveRating(id product.Id, rating ratings.R
 	t.r[id] = rating
 }
 
-const mongoHostKey = "MONGO_HOST"
-const mongoUserNameKey = "MONGO_USER"
-const mongoPasswordKey = "MONGO_PASS"
-
 type Credentials map[login.UserName]login.Password
+
+const googleCredentials = "GOOGLE_APPLICATION_CREDENTIALS"

@@ -127,13 +127,13 @@ func (s *mockPersistence) DeleteUser(name UserName) error {
 	panic("implement me")
 }
 
-func (s *mockPersistence) SetUserToken(user UserName, token Token, expirationTime time.Duration) error {
+func (s *mockPersistence) SetUserToken(user UserName, token Token, duration time.Duration) error {
 	if s.tokens == nil {
 		s.tokens = make(Tokens)
 	}
 	s.tokens[token] = TokenDetails{
 		User:       user,
-		Expiration: time.Now().Add(timeToLive),
+		Expiration: time.Now().Add(duration),
 	}
 	return nil
 }
