@@ -9,7 +9,7 @@ import (
 
 func (h *handler) getAllProducts() {
 	var products product.Products
-	products, err := h.persistence.GetProducts()
+	products, err := h.productPersistence.GetProducts()
 	if err != nil {
 		h.writer.WriteHeader(http.StatusInternalServerError)
 		_, _ = h.writer.Write([]byte(err.Error()))
@@ -24,7 +24,7 @@ func (h *handler) getAllProducts() {
 }
 
 func (h *handler) getSpecificProduct(productId product.Id) {
-	products, err := h.persistence.GetProducts()
+	products, err := h.productPersistence.GetProducts()
 	if err != nil {
 		h.writer.WriteHeader(http.StatusInternalServerError)
 		_, _ = h.writer.Write([]byte(err.Error()))

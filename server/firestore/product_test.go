@@ -18,7 +18,7 @@ func TestProductPersistence(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	const productName = "product-name"
-	p, err := product.New(productName, 100, "")
+	p, err := product.New(productName, 100, "", "")
 	if err != nil {
 		t.Fatal(err.Error())
 	}

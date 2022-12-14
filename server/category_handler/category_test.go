@@ -156,7 +156,7 @@ func postNewCategory(t *testing.T) (http.Handler, category.DTO, []byte) {
 }
 
 func addProductToCategory(t *testing.T, testCategory category.DTO, h http.Handler) ([]byte, product.Id) {
-	testProduct, err := product.New("test product", 1000, "a test product")
+	testProduct, err := product.New("test product", 1000, "a test product", "")
 	if err != nil {
 		t.Fatalf("could not create test product: %s", err.Error())
 	}

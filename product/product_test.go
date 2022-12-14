@@ -2,6 +2,7 @@ package product
 
 import (
 	"errors"
+	"spacemoon/login"
 	"testing"
 )
 
@@ -9,9 +10,10 @@ func TestProduct(t *testing.T) {
 	var testName Name = "test-name"
 	var testPrice Price = 0
 	var testDescription Description = ""
+	var testSeller login.UserName = "test-seller"
 	var err error
 	var testProduct Product
-	testProduct, err = New(testName, testPrice, testDescription)
+	testProduct, err = New(testName, testPrice, testDescription, testSeller)
 	if err != nil {
 		t.Fatalf("could not instantiate new product")
 	}
@@ -23,6 +25,7 @@ func TestProduct(t *testing.T) {
 		Description: testDescription,
 		Id:          testProduct.GetId(),
 		Type:        productType,
+		Seller:      testSeller,
 	}
 	dto := testProduct.DTO()
 	if dto != expectedDTO {
@@ -44,7 +47,7 @@ func TestNew_ThrowsErrorOnEmptyName(t *testing.T) {
 	var emptyName Name = ""
 	var testPrice Price = 100
 	var testDescription Description = "this is a test product"
-	_, err := New(emptyName, testPrice, testDescription)
+	_, err := New(emptyName, testPrice, testDescription, "")
 	if err == nil {
 		t.Fatalf("empty name not detected")
 	}

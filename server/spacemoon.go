@@ -27,7 +27,7 @@ func setupHandlers() {
 
 	protector := login.NewProtector(loginPersistence)
 
-	productHandler := product_handler.MakeHandler(getProductPersistence())
+	productHandler := product_handler.MakeHandler(getProductPersistence(), loginPersistence)
 	preparedProductHandler := prepareHandler(protector, productHandler, http.MethodGet)
 	http.Handle("/product", preparedProductHandler)
 	productRatingHandler := product_handler.MakeRankingsHandler(getProductRatingsPersistence())

@@ -7,9 +7,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"spacemoon/login"
 	"spacemoon/product"
 	"spacemoon/product/ratings"
 	"testing"
+	"time"
 )
 
 func TestHandler_ServeHTTP_Get(t *testing.T) {
@@ -26,9 +28,10 @@ func TestHandler_ServeHTTP_Get_OneProduct(t *testing.T) {
 
 func TestHandler_ServeHTTP_Post_Then_Get(t *testing.T) {
 	var fakePersistence product.Persistence = &fakePersistence{}
-	testHandler := MakeHandler(fakePersistence)
+	var fakeLoginPersistence login.Persistence = &fakeLoginPersistence{}
+	testHandler := MakeHandler(fakePersistence, fakeLoginPersistence)
 	const productName = "Mars rocks"
-	newProduct, err := product.New(productName, 1, "some description")
+	newProduct, err := product.New(productName, 1, "some description", "")
 	productJson, err := json.Marshal(newProduct)
 	if err != nil {
 		return
@@ -95,7 +98,7 @@ func validateThatSpecificExpectedProductIsRetrieved(t *testing.T, spy spyWriter)
 
 func setUpServeHTTPTest(target string) (http.Handler, *http.Request, spyWriter) {
 	var fakePersistence product.Persistence = stubPersistence{}
-	testHandler := MakeHandler(fakePersistence)
+	testHandler := MakeHandler(fakePersistence, &fakeLoginPersistence{})
 	fakeRequest := httptest.NewRequest(http.MethodGet, target, http.NoBody)
 	spy := spyWriter{}
 	return testHandler, fakeRequest, spy
@@ -166,6 +169,34 @@ func (f *fakePersistence) SaveProduct(p product.Product) error {
 }
 
 func (f *fakePersistence) DeleteProduct(id product.Id) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+type fakeLoginPersistence struct {
+}
+
+func (f fakeLoginPersistence) SetUserToken(name login.UserName, token login.Token, duration time.Duration) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f fakeLoginPersistence) GetUser(_ login.Token) (login.UserName, error) {
+
+	return "", nil
+}
+
+func (f fakeLoginPersistence) SignUpUser(u login.UserName, p login.Password) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f fakeLoginPersistence) ValidateCredentials(u login.UserName, p login.Password) bool {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f fakeLoginPersistence) DeleteUser(name login.UserName) error {
 	//TODO implement me
 	panic("implement me")
 }
