@@ -65,15 +65,20 @@ func (h *handler) login() {
 	if h.validatePassword(pass) {
 		return
 	}
-	newToken := NewTokenGenerator().NewToken(UseDefaultSize)
+	isValidAuth := h.persistence.ValidateCredentials(UserName(user), Password(pass))
+	if isValidAuth {
+		newToken := NewTokenGenerator().NewToken(UseDefaultSize)
 
-	err := h.persistence.SetUserToken(UserName(user), newToken, h.tokenExpirationTime)
-	if err != nil {
-		h.writer.WriteHeader(http.StatusInternalServerError)
-		_, _ = h.writer.Write([]byte(err.Error()))
+		err := h.persistence.SetUserToken(UserName(user), newToken, h.tokenExpirationTime)
+		if err != nil {
+			h.writer.WriteHeader(http.StatusInternalServerError)
+			_, _ = h.writer.Write([]byte(err.Error()))
+			return
+		}
+		h.respondWithAccessToken(newToken)
 		return
 	}
-	h.respondWithAccessToken(newToken)
+	h.writer.WriteHeader(http.StatusUnauthorized)
 }
 
 func (h *handler) signup() {
