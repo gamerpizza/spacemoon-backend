@@ -14,7 +14,7 @@ import (
 
 func main() {
 	log.Default().Print("starting spacemoon server 🚀")
-	log.Default().Print("v0.6.0")
+	log.Default().Print("v0.6.1")
 	setupHandlers()
 	listenAndServe()
 }

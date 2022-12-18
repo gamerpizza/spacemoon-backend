@@ -21,6 +21,10 @@ Right now, it is using PORT 1234 to receive the requests.
 * Instant Pay payment processing
 * Google Pay payment processing
 
+##  [v0.6.1] - _2022 12 18_
+### Added
+* Google Cloud Persistence for Social Network Posts
+
 ##  [v0.6.0] - _2022 12 18_
 ### Added
 * Basic Social Network Posts
