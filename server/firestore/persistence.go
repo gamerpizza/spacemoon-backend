@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"spacemoon/login"
+	"spacemoon/network"
 	"spacemoon/product"
 	"spacemoon/product/category"
 	"spacemoon/product/ratings"
@@ -15,6 +16,7 @@ type Persistence interface {
 	product.Persistence
 	ratings.Persistence
 	category.Persistence
+	network.Persistence
 	Close() error
 }
 
@@ -31,6 +33,35 @@ func GetPersistence(ctx context.Context) (Persistence, error) {
 type fireStorePersistence struct {
 	storage *firestore.Client
 	ctx     context.Context
+}
+
+func (p *fireStorePersistence) AddPost(post network.Post) error {
+	collection := p.storage.Collection(postsCollection)
+	_, err := collection.Doc(string(post.GetId())).Set(p.ctx, post)
+	if err != nil {
+		return fmt.Errorf("could not write to collection: %w", err)
+	}
+	return nil
+}
+
+func (p *fireStorePersistence) GetAllPosts() (network.Posts, error) {
+	collection := p.storage.Collection(postsCollection)
+	documents, err := collection.Documents(p.ctx).GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("could not write to collection: %w", err)
+	}
+
+	posts := network.Posts{}
+
+	for _, document := range documents {
+		var post network.Post
+		err = document.DataTo(&post)
+		if err != nil {
+			return nil, fmt.Errorf("could parse document: %w", err)
+		}
+		posts[post.GetId()] = post
+	}
+	return posts, nil
 }
 
 func (p *fireStorePersistence) Close() error {
@@ -65,5 +96,5 @@ func (p *fireStorePersistence) SaveRating(id product.Id, rating ratings.Rating) 
 }
 
 const loginCollection = "login"
-const loginTokensCollection = "login-tokens"
 const productCollection = "products"
+const postsCollection = "posts"
