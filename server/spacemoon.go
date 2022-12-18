@@ -5,8 +5,10 @@ import (
 	"log"
 	"net/http"
 	"spacemoon/login"
+	"spacemoon/network"
 	"spacemoon/server/category_handler"
 	"spacemoon/server/cors"
+	"spacemoon/server/network_handler"
 	"spacemoon/server/product_handler"
 	"time"
 )
@@ -22,10 +24,16 @@ func setupHandlers() {
 	log.Default().Print("registering server handlers...")
 
 	loginPersistence := getLoginPersistence()
-	corsEnabledLoginHandler := cors.EnableCors(login.NewHandler(loginPersistence, time.Hour), http.MethodGet)
+	corsEnabledLoginHandler := cors.EnableCors(login.NewHandler(loginPersistence, time.Hour), http.MethodGet, http.MethodPost)
 	http.Handle("/login", corsEnabledLoginHandler)
 
 	protector := login.NewProtector(loginPersistence)
+
+	socialNetworkHandler := network_handler.New(getSocialNetworkPersistence(), loginPersistence)
+	corsEnabledSocialNetworkHandler := cors.EnableCors(socialNetworkHandler, http.MethodGet, http.MethodPost)
+	protectedSocialNetworkHandler := protector.Protect(&corsEnabledSocialNetworkHandler)
+	protectedSocialNetworkHandler.Unprotect(http.MethodGet)
+	http.Handle("/posts", protectedSocialNetworkHandler)
 
 	productHandler := product_handler.MakeHandler(getProductPersistence(), loginPersistence)
 	preparedProductHandler := prepareHandler(protector, productHandler, http.MethodGet)
@@ -39,6 +47,26 @@ func setupHandlers() {
 	http.Handle("/category", preparedCategoryHandler)
 
 	log.Default().Print("handler registration done, ready for takeoff")
+}
+
+type temporarySocialNetworkPersistence struct {
+	posts network.Posts
+}
+
+func (t *temporarySocialNetworkPersistence) AddPost(post network.Post) error {
+	if t.posts == nil {
+		t.posts = make(network.Posts)
+	}
+	t.posts[post.GetId()] = post
+	return nil
+}
+
+func (t *temporarySocialNetworkPersistence) GetAllPosts() (network.Posts, error) {
+	return t.posts, nil
+}
+
+func getSocialNetworkPersistence() network.Persistence {
+	return &temporarySocialNetworkPersistence{}
 }
 
 func prepareHandler(protector login.Protector, handler http.Handler, unprotectedMethods ...string) http.Handler {
