@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"spacemoon/login"
+	"spacemoon/network"
 	"spacemoon/product"
 	"spacemoon/product/category"
 	"spacemoon/product/ratings"
@@ -33,6 +34,36 @@ func makeTemporaryLoginPersistence() login.Persistence {
 		users:  Credentials{},
 		tokens: login.Tokens{},
 	}
+}
+
+func getSocialNetworkPersistence() network.Persistence {
+	creds := os.Getenv(googleCredentials)
+	if strings.TrimSpace(creds) == "" {
+		log.Default().Print("using temporary (dev) login persistence - no google credentials file set")
+		return &temporarySocialNetworkPersistence{}
+	}
+	per, err := firestore.GetPersistence(context.Background())
+	if err != nil {
+		log.Default().Printf("using temporary (dev) login persistence - error getting firestore persistence: %s", err.Error())
+		return &temporarySocialNetworkPersistence{}
+	}
+	return per
+}
+
+type temporarySocialNetworkPersistence struct {
+	posts network.Posts
+}
+
+func (t *temporarySocialNetworkPersistence) AddPost(post network.Post) error {
+	if t.posts == nil {
+		t.posts = make(network.Posts)
+	}
+	t.posts[post.GetId()] = post
+	return nil
+}
+
+func (t *temporarySocialNetworkPersistence) GetAllPosts() (network.Posts, error) {
+	return t.posts, nil
 }
 
 func getProductPersistence() product.Persistence {

@@ -88,3 +88,5 @@ func (p *fireStorePersistence) DeleteUser(name login.UserName) error {
 	}
 	return nil
 }
+
+const loginTokensCollection = "login-tokens"
