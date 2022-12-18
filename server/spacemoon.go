@@ -4,17 +4,19 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"spacemoon/login"
 	"spacemoon/server/category_handler"
 	"spacemoon/server/cors"
 	"spacemoon/server/network_handler"
 	"spacemoon/server/product_handler"
+	"strings"
 	"time"
 )
 
 func main() {
 	log.Default().Print("starting spacemoon server 🚀")
-	log.Default().Print("v0.6.1")
+	log.Default().Print("v0.6.2")
 	setupHandlers()
 	listenAndServe()
 }
@@ -61,7 +63,18 @@ func prepareHandler(protector login.Protector, handler http.Handler, unprotected
 func listenAndServe() {
 	log.Default().Print(getRandomSpaceQuote())
 	log.Default().Printf("listening on port %d", port)
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	certFile := os.Getenv("cert_file")
+	keyFile := os.Getenv("key_file")
+	if strings.TrimSpace(certFile) == "" || strings.TrimSpace(keyFile) == "" {
+		log.Default().Print("serving without TLS\n")
+		err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+		if err != nil {
+			log.Default().Fatalf("error while performing listen and serve: %s", err.Error())
+		}
+		return
+	}
+	log.Default().Print("serving using TLS\n")
+	err := http.ListenAndServeTLS(fmt.Sprintf(":%d", port), certFile, keyFile, nil)
 	if err != nil {
 		log.Default().Fatalf("error while performing listen and serve: %s", err.Error())
 	}
