@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"spacemoon/login"
-	"spacemoon/network"
 	"spacemoon/server/category_handler"
 	"spacemoon/server/cors"
 	"spacemoon/server/network_handler"
@@ -47,26 +46,6 @@ func setupHandlers() {
 	http.Handle("/category", preparedCategoryHandler)
 
 	log.Default().Print("handler registration done, ready for takeoff")
-}
-
-type temporarySocialNetworkPersistence struct {
-	posts network.Posts
-}
-
-func (t *temporarySocialNetworkPersistence) AddPost(post network.Post) error {
-	if t.posts == nil {
-		t.posts = make(network.Posts)
-	}
-	t.posts[post.GetId()] = post
-	return nil
-}
-
-func (t *temporarySocialNetworkPersistence) GetAllPosts() (network.Posts, error) {
-	return t.posts, nil
-}
-
-func getSocialNetworkPersistence() network.Persistence {
-	return &temporarySocialNetworkPersistence{}
 }
 
 func prepareHandler(protector login.Protector, handler http.Handler, unprotectedMethods ...string) http.Handler {
