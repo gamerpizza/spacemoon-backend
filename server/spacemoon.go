@@ -16,7 +16,7 @@ import (
 
 func main() {
 	log.Default().Print("starting spacemoon server 🚀")
-	log.Default().Print("v0.6.2")
+	log.Default().Print("v0.6.3")
 	setupHandlers()
 	listenAndServe()
 }
@@ -31,10 +31,10 @@ func setupHandlers() {
 	protector := login.NewProtector(loginPersistence)
 
 	socialNetworkHandler := network_handler.New(getSocialNetworkPersistence(), loginPersistence)
-	corsEnabledSocialNetworkHandler := cors.EnableCors(socialNetworkHandler, http.MethodGet, http.MethodPost)
-	protectedSocialNetworkHandler := protector.Protect(&corsEnabledSocialNetworkHandler)
+	protectedSocialNetworkHandler := protector.Protect(&socialNetworkHandler)
 	protectedSocialNetworkHandler.Unprotect(http.MethodGet)
-	http.Handle("/posts", protectedSocialNetworkHandler)
+	corsEnabledSocialNetworkHandler := cors.EnableCors(protectedSocialNetworkHandler, http.MethodGet, http.MethodPost)
+	http.Handle("/posts", corsEnabledSocialNetworkHandler)
 
 	productHandler := product_handler.MakeHandler(getProductPersistence(), loginPersistence)
 	preparedProductHandler := prepareHandler(protector, productHandler, http.MethodGet)
