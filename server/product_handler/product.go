@@ -67,7 +67,7 @@ func (h *handler) createProduct() {
 	_, exists := existingProducts[newProduct.Id]
 	if exists {
 		h.writer.WriteHeader(http.StatusConflict)
-		_, _ = h.writer.Write([]byte("a product with that Id already exists"))
+		_, _ = h.writer.Write([]byte("a product with that GetId already exists"))
 		return
 	}
 	bearer := h.request.Header.Get("Authorization")
@@ -101,7 +101,7 @@ func (h *handler) deleteProduct() {
 	productId := h.getIdFromRequest()
 	if isEmpty(productId) {
 		h.writer.WriteHeader(http.StatusBadRequest)
-		_, _ = h.writer.Write([]byte("you did not specify the Id of the item to be deleted"))
+		_, _ = h.writer.Write([]byte("you did not specify the GetId of the item to be deleted"))
 		return
 	}
 	existingProducts, err := h.productPersistence.GetProducts()

@@ -180,9 +180,8 @@ func (f *mockLoginPersistence) SignUpUser(u UserName, p Password) error {
 	panic("implement me")
 }
 
-func (f *mockLoginPersistence) ValidateCredentials(u UserName, p Password) bool {
-	//TODO implement me
-	panic("implement me")
+func (f *mockLoginPersistence) ValidateCredentials(_ UserName, _ Password) bool {
+	return true
 }
 
 func (f *mockLoginPersistence) DeleteUser(name UserName) error {
