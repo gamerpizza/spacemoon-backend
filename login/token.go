@@ -32,7 +32,6 @@ func (t tokenGenerator) NewToken(size int) Token {
 		b[i] = TokenCharacters[rand.Intn(len(TokenCharacters))]
 	}
 	return Token(b)
-
 }
 
 type Credential struct {

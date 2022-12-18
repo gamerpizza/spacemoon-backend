@@ -29,7 +29,7 @@ func (rh *rankingsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		rating, err := strconv.ParseInt(ratingStr, 10, 64)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			_, _ = w.Write([]byte("could not post rating: " + err.Error()))
+			_, _ = w.Write([]byte("could not network rating: " + err.Error()))
 		}
 		w.WriteHeader(http.StatusOK)
 		rh.rater.AddRating(product.Id(productId), ratings.Score(rating))
