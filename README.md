@@ -20,6 +20,12 @@ Right now, it is using PORT 1234 to receive the requests.
 * Stripe payment processing
 * Instant Pay payment processing
 * Google Pay payment processing
+* Image and Video on social media posts
+* Comments on social media posts
+
+##  [v0.6.3] - _2022 12 18_
+### Fixed
+* Fixed CORS on social media Posts API
 
 ##  [v0.6.2] - _2022 12 18_
 ### Added
