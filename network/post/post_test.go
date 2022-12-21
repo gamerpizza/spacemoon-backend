@@ -1,4 +1,4 @@
-package network
+package post
 
 import (
 	"testing"

@@ -3,17 +3,28 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"spacemoon/login"
 	"spacemoon/network"
+	"spacemoon/network/post"
 	"spacemoon/product"
 	"spacemoon/product/category"
 	"spacemoon/product/ratings"
-	"spacemoon/server/firestore"
+	"spacemoon/server/persistence/bucket"
+	"spacemoon/server/persistence/firestore"
 	"strings"
 	"time"
 )
+
+func getMediaFilePersistence(ctx context.Context) (network.MediaFilePersistence, error) {
+	mediaFilePersistence, err := bucket.New(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not instantiate media file persistence: %w", err)
+	}
+	return mediaFilePersistence, nil
+}
 
 func getLoginPersistence() login.Persistence {
 	creds := os.Getenv(googleCredentials)
@@ -51,18 +62,18 @@ func getSocialNetworkPersistence() network.Persistence {
 }
 
 type temporarySocialNetworkPersistence struct {
-	posts network.Posts
+	posts post.Posts
 }
 
-func (t *temporarySocialNetworkPersistence) AddPost(post network.Post) error {
+func (t *temporarySocialNetworkPersistence) AddPost(p post.Post) error {
 	if t.posts == nil {
-		t.posts = make(network.Posts)
+		t.posts = make(post.Posts)
 	}
-	t.posts[post.GetId()] = post
+	t.posts[p.GetId()] = p
 	return nil
 }
 
-func (t *temporarySocialNetworkPersistence) GetAllPosts() (network.Posts, error) {
+func (t *temporarySocialNetworkPersistence) GetAllPosts() (post.Posts, error) {
 	return t.posts, nil
 }
 

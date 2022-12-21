@@ -1,6 +1,7 @@
 package network
 
 import (
+	"spacemoon/network/post"
 	"testing"
 )
 
@@ -12,15 +13,15 @@ func TestNetwork(t *testing.T) {
 	const imageUrl2 = "image-url-2"
 	const videoUrl1 = "video-url-1"
 	const videoUrl2 = "video-url-2"
-	var post, _ = n.Post(caption, imageUrl1, imageUrl2, videoUrl1, videoUrl2)
-	if post.GetCaption() != caption {
-		t.Fatalf("invalid Caption (%s), expected: %s", post.GetCaption(), caption)
+	var p, _ = n.Post(caption, imageUrl1, imageUrl2, videoUrl1, videoUrl2)
+	if p.GetCaption() != caption {
+		t.Fatalf("invalid Caption (%s), expected: %s", p.GetCaption(), caption)
 	}
-	if post.GetAuthor() != user {
-		t.Fatalf("invalid Author (%s), expected: %s", post.GetAuthor(), user)
+	if p.GetAuthor() != user {
+		t.Fatalf("invalid Author (%s), expected: %s", p.GetAuthor(), user)
 	}
-	var c Content = post.Content()
-	var urls PostContentURLS = c.GetURLS()
+	var c post.Content = p.Content()
+	var urls post.ContentURLS = c.GetURLS()
 	if urls.Is(imageUrl1).NotPresent() {
 		t.Fatalf("(%s) url not found", imageUrl1)
 	}
@@ -34,8 +35,8 @@ func TestNetwork(t *testing.T) {
 		t.Fatalf("(%s) url not found", videoUrl2)
 	}
 
-	var _ PostId = post.GetId()
-	var _ Comments = post.Comments()
+	var _ post.Id = p.GetId()
+	var _ post.Comments = p.Comments()
 }
 
 func TestNetwork_GetPosts(t *testing.T) {
@@ -55,31 +56,17 @@ func TestNetwork_GetPosts(t *testing.T) {
 
 }
 
-type Verifier struct {
-	url  PostContentURL
-	urls PostContentURLS
-}
-
-func (v Verifier) NotPresent() bool {
-	_, exists := v.urls[v.url]
-	return !exists
-}
-
-func (u PostContentURLS) Is(url PostContentURL) Verifier {
-	return Verifier{urls: u, url: url}
-}
-
 type mockPersistence struct {
-	posts Posts
+	posts post.Posts
 }
 
-func (m *mockPersistence) GetAllPosts() (Posts, error) {
+func (m *mockPersistence) GetAllPosts() (post.Posts, error) {
 	return m.posts, nil
 }
 
-func (m *mockPersistence) AddPost(p Post) error {
+func (m *mockPersistence) AddPost(p post.Post) error {
 	if m.posts == nil {
-		m.posts = make(Posts)
+		m.posts = make(post.Posts)
 	}
 	m.posts[p.GetId()] = p
 	return nil
