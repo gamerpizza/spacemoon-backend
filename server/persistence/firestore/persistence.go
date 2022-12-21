@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"spacemoon/login"
 	"spacemoon/network"
+	"spacemoon/network/post"
 	"spacemoon/product"
 	"spacemoon/product/category"
 	"spacemoon/product/ratings"
@@ -35,7 +36,7 @@ type fireStorePersistence struct {
 	ctx     context.Context
 }
 
-func (p *fireStorePersistence) AddPost(post network.Post) error {
+func (p *fireStorePersistence) AddPost(post post.Post) error {
 	collection := p.storage.Collection(postsCollection)
 	_, err := collection.Doc(string(post.GetId())).Set(p.ctx, post)
 	if err != nil {
@@ -44,17 +45,17 @@ func (p *fireStorePersistence) AddPost(post network.Post) error {
 	return nil
 }
 
-func (p *fireStorePersistence) GetAllPosts() (network.Posts, error) {
+func (p *fireStorePersistence) GetAllPosts() (post.Posts, error) {
 	collection := p.storage.Collection(postsCollection)
 	documents, err := collection.Documents(p.ctx).GetAll()
 	if err != nil {
 		return nil, fmt.Errorf("could not write to collection: %w", err)
 	}
 
-	posts := network.Posts{}
+	posts := post.Posts{}
 
 	for _, document := range documents {
-		var post network.Post
+		var post post.Post
 		err = document.DataTo(&post)
 		if err != nil {
 			return nil, fmt.Errorf("could parse document: %w", err)

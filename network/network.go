@@ -3,20 +3,27 @@ package network
 import (
 	"github.com/google/uuid"
 	"spacemoon/login"
+	"spacemoon/network/post"
+	"time"
 )
-
-type Network interface {
-	Post(caption PostCaption, content ...PostContentURL) (Post, error)
-	GetPosts() (Posts, error)
-}
-
-type Persistence interface {
-	AddPost(post Post) error
-	GetAllPosts() (Posts, error)
-}
 
 func New(p Persistence, user login.UserName) Network {
 	return poster{persistence: p, user: user}
+}
+
+func NewPost(caption post.Caption, author login.UserName, urls post.ContentURLS) post.Post {
+	var id = post.Id(uuid.NewString())
+	return post.Post{Caption: caption, Author: author, URLS: urls, Id: id, Created: time.Now()}
+}
+
+type Network interface {
+	Post(caption post.Caption, content ...post.ContentURI) (post.Post, error) //content
+	GetPosts() (post.Posts, error)
+}
+
+type Persistence interface {
+	AddPost(post post.Post) error
+	GetAllPosts() (post.Posts, error)
 }
 
 type poster struct {
@@ -24,33 +31,26 @@ type poster struct {
 	persistence Persistence
 }
 
-func (p poster) GetPosts() (posts Posts, err error) {
+func (p poster) GetPosts() (posts post.Posts, err error) {
 	posts, err = p.persistence.GetAllPosts()
 	return
 }
 
-func (p poster) Post(c PostCaption, content ...PostContentURL) (Post, error) {
-	post := p.makePost(c, content)
-	err := p.persistence.AddPost(post)
+func (p poster) Post(c post.Caption, content ...post.ContentURI) (post.Post, error) {
+	pst := p.makePost(c, content)
+	err := p.persistence.AddPost(pst)
 	if err != nil {
-		return Post{}, err
+		return post.Post{}, err
 	}
-	return post, nil
+	return pst, nil
 }
 
-func (p poster) makePost(c PostCaption, content []PostContentURL) Post {
-	urls := make(PostContentURLS)
+func (p poster) makePost(c post.Caption, content []post.ContentURI) post.Post {
+	urls := make(post.ContentURLS)
 	for _, url := range content {
 		urls[url] = nil
 	}
 
-	post := NewPost(c, p.user, urls)
-	return post
+	pst := NewPost(c, p.user, urls)
+	return pst
 }
-
-func NewPost(caption PostCaption, author login.UserName, urls PostContentURLS) Post {
-	var id = PostId(uuid.NewString())
-	return Post{Caption: caption, Author: author, URLS: urls, Id: id}
-}
-
-type PostContentURL string
