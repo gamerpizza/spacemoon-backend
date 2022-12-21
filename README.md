@@ -21,9 +21,11 @@ Right now, it is using PORT 1234 to receive the requests.
 * Instant Pay payment processing
 * Google Pay payment processing
 * Image and Video on social media posts
-  * Save image and ad URLs to post
 * Comments on social media posts
 
+##  [v1.0.0] - _2022 12 22_
+### Added
+* Save image and ad URLs to post
 
 ##  [v0.6.3] - _2022 12 18_
 ### Fixed
