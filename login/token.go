@@ -53,7 +53,7 @@ const TokenCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123
 // possibilities, so it should not repeat itself
 const DefaultTokenSize = 42
 
-// UseDefaultSize is used when generating a NewToken as an alternate way to ask for it to be of the DefaultTokenSize
+// UseDefaultSize is used when generating a newToken as an alternate way to ask for it to be of the DefaultTokenSize
 const UseDefaultSize = 0
 
 var tokenExpiredError = errors.New("token expired")

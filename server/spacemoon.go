@@ -1,22 +1,23 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"spacemoon/login"
-	"spacemoon/server/category_handler"
 	"spacemoon/server/cors"
-	"spacemoon/server/network_handler"
-	"spacemoon/server/product_handler"
+	"spacemoon/server/handlers/category_handler"
+	"spacemoon/server/handlers/network_handler"
+	product_handler2 "spacemoon/server/handlers/product_handler"
 	"strings"
 	"time"
 )
 
 func main() {
 	log.Default().Print("starting spacemoon server 🚀")
-	log.Default().Print("v0.6.3")
+	log.Default().Print("v1.0.0")
 	setupHandlers()
 	listenAndServe()
 }
@@ -30,16 +31,20 @@ func setupHandlers() {
 
 	protector := login.NewProtector(loginPersistence)
 
-	socialNetworkHandler := network_handler.New(getSocialNetworkPersistence(), loginPersistence)
+	mediaFilePersistence, err := getMediaFilePersistence(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	socialNetworkHandler := network_handler.New(getSocialNetworkPersistence(), loginPersistence, mediaFilePersistence)
 	protectedSocialNetworkHandler := protector.Protect(&socialNetworkHandler)
 	protectedSocialNetworkHandler.Unprotect(http.MethodGet)
 	corsEnabledSocialNetworkHandler := cors.EnableCors(protectedSocialNetworkHandler, http.MethodGet, http.MethodPost)
 	http.Handle("/posts", corsEnabledSocialNetworkHandler)
 
-	productHandler := product_handler.MakeHandler(getProductPersistence(), loginPersistence)
+	productHandler := product_handler2.MakeHandler(getProductPersistence(), loginPersistence)
 	preparedProductHandler := prepareHandler(protector, productHandler, http.MethodGet)
 	http.Handle("/product", preparedProductHandler)
-	productRatingHandler := product_handler.MakeRankingsHandler(getProductRatingsPersistence())
+	productRatingHandler := product_handler2.MakeRankingsHandler(getProductRatingsPersistence())
 	preparedProductRatingHandler := prepareHandler(protector, productRatingHandler, http.MethodGet)
 	http.Handle("/product/rating", preparedProductRatingHandler)
 
