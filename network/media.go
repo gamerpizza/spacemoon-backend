@@ -28,9 +28,12 @@ type mediaFileContentManager struct {
 }
 
 func (cm mediaFileContentManager) SaveNewPostWithMedia(p post.Post, f map[string]io.Reader) error {
-	var urls, _ = cm.mediaFilePersistence.SaveFiles(f, prefix+string(p.GetId())+"/")
+	var urls, err = cm.mediaFilePersistence.SaveFiles(f, prefix+string(p.GetId())+"/")
+	if err != nil {
+		return fmt.Errorf("could not save files: %w", err)
+	}
 	p.URLS = urls
-	err := cm.postPersistence.AddPost(p)
+	err = cm.postPersistence.AddPost(p)
 	if err != nil {
 		return fmt.Errorf("could not save post with media URLs: %w", err)
 	}
