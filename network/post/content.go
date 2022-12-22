@@ -8,16 +8,14 @@ func (c Content) GetURLS() ContentURIS {
 	return c.URLS
 }
 
-type ContentURIS map[ContentURI]bool
+type ContentURIS map[string]bool
 
-func (u ContentURIS) Is(url ContentURI) Verifier {
+func (u ContentURIS) Is(url string) Verifier {
 	return Verifier{urls: u, url: url}
 }
 
-type ContentURI string
-
 type Verifier struct {
-	url  ContentURI
+	url  string
 	urls ContentURIS
 }
 

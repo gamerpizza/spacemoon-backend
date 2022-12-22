@@ -17,7 +17,7 @@ func NewPost(caption post.Caption, author login.UserName, urls post.ContentURIS)
 }
 
 type Network interface {
-	Post(caption post.Caption, content ...post.ContentURI) (post.Post, error) //content
+	Post(caption post.Caption, content ...string) (post.Post, error) //content
 	GetPosts() (post.Posts, error)
 }
 
@@ -36,7 +36,7 @@ func (p poster) GetPosts() (posts post.Posts, err error) {
 	return
 }
 
-func (p poster) Post(c post.Caption, content ...post.ContentURI) (post.Post, error) {
+func (p poster) Post(c post.Caption, content ...string) (post.Post, error) {
 	pst := p.makePost(c, content)
 	err := p.persistence.AddPost(pst)
 	if err != nil {
@@ -45,7 +45,7 @@ func (p poster) Post(c post.Caption, content ...post.ContentURI) (post.Post, err
 	return pst, nil
 }
 
-func (p poster) makePost(c post.Caption, content []post.ContentURI) post.Post {
+func (p poster) makePost(c post.Caption, content []string) post.Post {
 	urls := make(post.ContentURIS)
 	for _, url := range content {
 		urls[url] = true

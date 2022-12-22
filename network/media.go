@@ -18,8 +18,8 @@ func NewMediaContentManager(p Persistence, mp MediaFilePersistence) MediaFileCon
 
 type MediaFilePersistence interface {
 	SaveFiles(files map[string]io.Reader, prefix string) (post.ContentURIS, error)
-	GetFile(post.ContentURI) (io.Reader, error)
-	Delete(post.ContentURI) error
+	GetFile(uri string) (io.Reader, error)
+	Delete(uri string) error
 }
 
 type mediaFileContentManager struct {
