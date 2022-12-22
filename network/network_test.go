@@ -21,7 +21,7 @@ func TestNetwork(t *testing.T) {
 		t.Fatalf("invalid Author (%s), expected: %s", p.GetAuthor(), user)
 	}
 	var c post.Content = p.Content()
-	var urls post.ContentURLS = c.GetURLS()
+	var urls post.ContentURIS = c.GetURLS()
 	if urls.Is(imageUrl1).NotPresent() {
 		t.Fatalf("(%s) url not found", imageUrl1)
 	}

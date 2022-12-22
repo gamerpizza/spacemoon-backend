@@ -1,16 +1,16 @@
 package post
 
 type Content struct {
-	URLS ContentURLS `json:"URLS"`
+	URLS ContentURIS `json:"URLS"`
 }
 
-func (c Content) GetURLS() ContentURLS {
+func (c Content) GetURLS() ContentURIS {
 	return c.URLS
 }
 
-type ContentURLS map[ContentURI]interface{}
+type ContentURIS map[ContentURI]bool
 
-func (u ContentURLS) Is(url ContentURI) Verifier {
+func (u ContentURIS) Is(url ContentURI) Verifier {
 	return Verifier{urls: u, url: url}
 }
 
@@ -18,7 +18,7 @@ type ContentURI string
 
 type Verifier struct {
 	url  ContentURI
-	urls ContentURLS
+	urls ContentURIS
 }
 
 func (v Verifier) NotPresent() bool {

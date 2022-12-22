@@ -81,8 +81,8 @@ func (s *fakeMediaFilePersistence) Delete(url post.ContentURI) error {
 	return nil
 }
 
-func (s *fakeMediaFilePersistence) SaveFiles(files map[string]io.Reader, prefix string) (post.ContentURLS, error) {
-	urls := post.ContentURLS{}
+func (s *fakeMediaFilePersistence) SaveFiles(files map[string]io.Reader, prefix string) (post.ContentURIS, error) {
+	urls := post.ContentURIS{}
 	generator := login.NewTokenGenerator()
 	if s.files == nil {
 		s.files = make(map[post.ContentURI]io.Reader)
@@ -95,7 +95,7 @@ func (s *fakeMediaFilePersistence) SaveFiles(files map[string]io.Reader, prefix 
 		}
 		url := post.ContentURI(prefix + string(generator.NewToken(8)) + string(fileExt))
 		s.files[url] = file
-		urls[url] = nil
+		urls[url] = true
 	}
 	return urls, nil
 }

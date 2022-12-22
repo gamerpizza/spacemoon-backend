@@ -37,8 +37,8 @@ func (p persistence) Delete(uri post.ContentURI) error {
 	return nil
 }
 
-func (p persistence) SaveFiles(files map[string]io.Reader, prefix string) (post.ContentURLS, error) {
-	urls := post.ContentURLS{}
+func (p persistence) SaveFiles(files map[string]io.Reader, prefix string) (post.ContentURIS, error) {
+	urls := post.ContentURIS{}
 	generator := newUriGenerator()
 
 	for name, file := range files {
@@ -56,7 +56,7 @@ func (p persistence) SaveFiles(files map[string]io.Reader, prefix string) (post.
 		if err != nil {
 			return nil, fmt.Errorf("could not close file on cloud: %w", err)
 		}
-		urls[u] = nil
+		urls[u] = true
 	}
 	return urls, nil
 

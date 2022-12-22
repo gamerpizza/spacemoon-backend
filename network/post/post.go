@@ -8,7 +8,7 @@ import (
 type Post struct {
 	Caption Caption        `json:"caption"`
 	Author  login.UserName `json:"author"`
-	URLS    ContentURLS    `json:"urls"`
+	URLS    ContentURIS    `json:"urls"`
 	Id      Id             `json:"id"`
 	Created time.Time      `json:"created"`
 }

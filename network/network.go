@@ -11,7 +11,7 @@ func New(p Persistence, user login.UserName) Network {
 	return poster{persistence: p, user: user}
 }
 
-func NewPost(caption post.Caption, author login.UserName, urls post.ContentURLS) post.Post {
+func NewPost(caption post.Caption, author login.UserName, urls post.ContentURIS) post.Post {
 	var id = post.Id(uuid.NewString())
 	return post.Post{Caption: caption, Author: author, URLS: urls, Id: id, Created: time.Now()}
 }
@@ -46,9 +46,9 @@ func (p poster) Post(c post.Caption, content ...post.ContentURI) (post.Post, err
 }
 
 func (p poster) makePost(c post.Caption, content []post.ContentURI) post.Post {
-	urls := make(post.ContentURLS)
+	urls := make(post.ContentURIS)
 	for _, url := range content {
-		urls[url] = nil
+		urls[url] = true
 	}
 
 	pst := NewPost(c, p.user, urls)
