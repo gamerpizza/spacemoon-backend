@@ -23,6 +23,10 @@ Right now, it is using PORT 1234 to receive the requests.
 * Image and Video on social media posts
 * Comments on social media posts
 
+##  [v1.0.2] - _2022 12 23_
+### Fixed
+* likes saved
+
 ##  [v1.0.1] - _2022 12 23_
 ### Added
 * check if user exists before creating it
