@@ -116,6 +116,11 @@ func loginExpectedUser(t *testing.T, fakePersistence Persistence) string {
 type stubTokenLoginPersistence struct {
 }
 
+func (s stubTokenLoginPersistence) Check(name UserName) (bool, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (s stubTokenLoginPersistence) SignUpUser(u UserName, p Password) error {
 	//TODO implement me
 	panic("implement me")
@@ -173,6 +178,11 @@ const serveMessage = "Serving HTTP"
 
 type mockLoginPersistence struct {
 	credentials Tokens
+}
+
+func (f *mockLoginPersistence) Check(name UserName) (bool, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (f *mockLoginPersistence) SignUpUser(u UserName, p Password) error {

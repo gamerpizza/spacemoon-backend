@@ -16,6 +16,7 @@ func NewMediaContentManager(p Persistence, mp MediaFilePersistence) MediaFileCon
 	return mediaFileContentManager{postPersistence: p, mediaFilePersistence: mp}
 }
 
+// MediaFilePersistence defines how this package saves media files, represented in the more generic io.Reader form
 type MediaFilePersistence interface {
 	SaveFiles(files map[string]io.Reader, prefix string) (post.ContentURIS, error)
 	GetFile(uri string) (io.Reader, error)

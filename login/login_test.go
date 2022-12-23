@@ -1,6 +1,8 @@
 package login
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -45,7 +47,6 @@ func TestHandler_Auth(t *testing.T) {
 }
 
 func TestHandler_TokenExpiration(t *testing.T) {
-
 	h, spy, request := setUpGetRequest(2 * time.Second)
 
 	request.SetBasicAuth(expectedUser, expectedPass)
@@ -65,6 +66,52 @@ func TestHandler_TokenExpiration(t *testing.T) {
 	time.Sleep(3 * time.Second)
 	if user, err := h.persistence.GetUser(token); !errors.Is(err, tokenExpiredError) || user != "" {
 		t.Fatal("token did not expire")
+	}
+}
+
+func TestHandler_ServeHTTP_PostShouldSignup(t *testing.T) {
+	var h = NewHandler(&mockPersistence{}, time.Hour)
+	signUpSpy := spyWriter{}
+	const newUsername = "newUser"
+	const newPassword = "newPass"
+	user := User{
+		UserName: "newUser",
+		Password: "newPass",
+	}
+	marshal, err := json.Marshal(user)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	signUpRequest := httptest.NewRequest(http.MethodPost, "/login", bytes.NewReader(marshal))
+	h.ServeHTTP(&signUpSpy, signUpRequest)
+
+	if signUpSpy.statusCode < 200 || signUpSpy.statusCode >= 300 {
+		t.Fatalf("bad status code :%d", signUpSpy.statusCode)
+	}
+
+	doubleSignUpSpy := spyWriter{}
+	h.ServeHTTP(&doubleSignUpSpy, signUpRequest)
+	if doubleSignUpSpy.statusCode >= 200 && doubleSignUpSpy.statusCode < 300 {
+		t.Fatalf("bad status code, should not be able to sign up with the same name :%d", doubleSignUpSpy.statusCode)
+	}
+
+	loginSpy := spyWriter{}
+	loginRequest := httptest.NewRequest(http.MethodGet, "/login", http.NoBody)
+	loginRequest.SetBasicAuth(newUsername, newPassword)
+	h.ServeHTTP(&loginSpy, loginRequest)
+
+	if loginSpy.statusCode < 200 || loginSpy.statusCode >= 300 {
+		t.Fatalf("bad status code :%d", loginSpy.statusCode)
+	}
+
+	badLoginSpy := spyWriter{}
+	badLoginRequest := httptest.NewRequest(http.MethodGet, "/login", http.NoBody)
+	badLoginRequest.SetBasicAuth("bad-user", "pass")
+	h.ServeHTTP(&badLoginSpy, badLoginRequest)
+
+	if badLoginSpy.statusCode >= 200 && badLoginSpy.statusCode < 300 {
+		t.Fatalf("bad status code, user should not be able to login :%d", badLoginSpy.statusCode)
 	}
 }
 
@@ -114,17 +161,25 @@ func (s *spyWriter) WriteHeader(statusCode int) {
 }
 
 type mockPersistence struct {
-	tokens Tokens
+	tokens      Tokens
+	credentials map[UserName]Password
+}
+
+func (s *mockPersistence) Check(_ UserName) (bool, error) {
+	return false, nil
 }
 
 func (s *mockPersistence) SignUpUser(u UserName, p Password) error {
-	//TODO implement me
-	panic("implement me")
+	if s.credentials == nil {
+		s.credentials = make(map[UserName]Password)
+	}
+	s.credentials[u] = p
+	return nil
 }
 
 func (s *mockPersistence) DeleteUser(name UserName) error {
-	//TODO implement me
-	panic("implement me")
+	delete(s.credentials, name)
+	return nil
 }
 
 func (s *mockPersistence) SetUserToken(user UserName, token Token, duration time.Duration) error {
@@ -150,10 +205,13 @@ func (s *mockPersistence) GetUser(token Token) (UserName, error) {
 }
 
 func (s *mockPersistence) ValidateCredentials(u UserName, p Password) bool {
-	if u != expectedUser || p != expectedPass {
-		return false
+	if u == expectedUser || p == expectedPass {
+		return true
 	}
-	return true
+	if s.credentials != nil && s.credentials[u] == p {
+		return true
+	}
+	return false
 }
 
 const expectedUser = "expected-user"

@@ -16,7 +16,7 @@ func TestCreatePostWithMedia(t *testing.T) {
 	cm := NewMediaContentManager(p, mp)
 	pst := post.Post{
 		Caption: "this post is a test",
-		Author:  "mr Test Poster",
+		Author:  "mr Test PostManager",
 		Id:      postId,
 	}
 	f1, f2, err := getTestImageFiles(t)
