@@ -55,19 +55,3 @@ func TestNetwork_GetPosts(t *testing.T) {
 	}
 
 }
-
-type mockPersistence struct {
-	posts post.Posts
-}
-
-func (m *mockPersistence) GetAllPosts() (post.Posts, error) {
-	return m.posts, nil
-}
-
-func (m *mockPersistence) AddPost(p post.Post) error {
-	if m.posts == nil {
-		m.posts = make(post.Posts)
-	}
-	m.posts[p.GetId()] = p
-	return nil
-}

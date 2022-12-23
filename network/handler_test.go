@@ -1,13 +1,13 @@
-package network_handler
+package network
 
 import (
-	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"spacemoon/login"
-	"spacemoon/network"
 	"spacemoon/network/post"
 	"testing"
 	"time"
@@ -53,16 +53,16 @@ func TestHandler_ServeHTTP_PostShouldSaveAPost(t *testing.T) {
 	h := New(&mockPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
 	const testCaption = "some caption"
 
-	p := network.NewPost(testCaption, testAuthor, nil)
-	marshal, err := json.Marshal(p)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
+	p := NewPost(testCaption, testAuthor, nil)
 
-	postRequest := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(marshal))
+	form := url.Values{}
+	form.Add("caption", testCaption)
+	postRequest := httptest.NewRequest(http.MethodPost, "/", http.NoBody)
+	postRequest.Header.Set("Content-Type", "multipart/form-data; boundary=*")
+	postRequest.Form = form
 	postRecorder := httptest.NewRecorder()
 	h.ServeHTTP(postRecorder, postRequest)
-	if postRecorder.Code != http.StatusOK {
+	if code := postRecorder.Code; code != http.StatusOK && code != http.StatusAccepted {
 		t.Fatalf("invalid status %d", postRecorder.Code)
 	}
 
@@ -74,14 +74,14 @@ func TestHandler_ServeHTTP_PostShouldSaveAPost(t *testing.T) {
 	}
 
 	posts := post.Posts{}
-	err = json.Unmarshal(getRecorder.Body.Bytes(), &posts)
+	err := json.Unmarshal(getRecorder.Body.Bytes(), &posts)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
 
 	found := false
-	for _, p := range posts {
-		if p.GetCaption() == testCaption && p.GetAuthor() == testAuthor {
+	for _, pst := range posts {
+		if pst.GetCaption() == testCaption && p.GetAuthor() == testAuthor {
 			found = true
 			break
 		}
@@ -89,6 +89,65 @@ func TestHandler_ServeHTTP_PostShouldSaveAPost(t *testing.T) {
 	if !found {
 		t.Fatal("post not found")
 	}
+}
+
+func TestHandler_ServeHTTP_FailsOnPersistenceFail(t *testing.T) {
+	h := New(failPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
+	request := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
+	recorder := httptest.NewRecorder()
+	h.ServeHTTP(recorder, request)
+	if recorder.Code >= 200 && recorder.Code < 300 {
+		t.Fatal("error not thrown")
+	}
+}
+
+func TestHandler_ServeHTTP_PostFailsOnLoginPersistenceFail(t *testing.T) {
+	h := New(stubPersistence{}, failLoginPersistence{}, stubMediaFilePersistence{})
+	request := httptest.NewRequest(http.MethodPost, "/", http.NoBody)
+	recorder := httptest.NewRecorder()
+	h.ServeHTTP(recorder, request)
+	if recorder.Code >= 200 && recorder.Code < 300 {
+		t.Fatalf("error not thrown: %+v", recorder)
+	}
+}
+
+type failPersistence struct {
+}
+
+func (f failPersistence) AddPost(_ post.Post) error {
+	return errors.New("some fake error")
+}
+
+func (f failPersistence) GetAllPosts() (post.Posts, error) {
+	return nil, errors.New("some fake error")
+}
+
+type failLoginPersistence struct {
+}
+
+func (f failLoginPersistence) SetUserToken(_ login.UserName, _ login.Token, _ time.Duration) error {
+	return fakeError
+}
+
+func (f failLoginPersistence) GetUser(_ login.Token) (login.UserName, error) {
+	return "", fakeError
+}
+
+func (f failLoginPersistence) SignUpUser(u login.UserName, p login.Password) error {
+	return fakeError
+}
+
+func (f failLoginPersistence) ValidateCredentials(u login.UserName, p login.Password) bool {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f failLoginPersistence) DeleteUser(name login.UserName) error {
+	return fakeError
+}
+
+func (f failLoginPersistence) Check(name login.UserName) (bool, error) {
+	return false, fakeError
 }
 
 type stubPersistence struct {
@@ -123,7 +182,12 @@ func (m *mockPersistence) GetAllPosts() (post.Posts, error) {
 type stubLoginPersistence struct {
 }
 
-func (f stubLoginPersistence) SetUserToken(name login.UserName, token login.Token, duration time.Duration) error {
+func (f stubLoginPersistence) Check(_ login.UserName) (bool, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (f stubLoginPersistence) SetUserToken(_ login.UserName, _ login.Token, _ time.Duration) error {
 	//TODO implement me
 	panic("implement me")
 }
@@ -150,9 +214,8 @@ func (f stubLoginPersistence) DeleteUser(name login.UserName) error {
 type stubMediaFilePersistence struct {
 }
 
-func (s stubMediaFilePersistence) SaveFiles(files map[string]io.Reader, prefix string) (post.ContentURIS, error) {
-	//TODO implement me
-	panic("implement me")
+func (s stubMediaFilePersistence) SaveFiles(_ map[string]io.Reader, _ string) (post.ContentURIS, error) {
+	return nil, nil
 }
 
 func (s stubMediaFilePersistence) GetFile(uri string) (io.Reader, error) {
@@ -166,3 +229,5 @@ func (s stubMediaFilePersistence) Delete(uri string) error {
 }
 
 const testAuthor = "Edgar Allan Post"
+
+var fakeError = errors.New("some fake error")

@@ -1,21 +1,20 @@
-package network_handler
+package network
 
 import (
 	"encoding/json"
 	"io"
 	"net/http"
 	"spacemoon/login"
-	"spacemoon/network"
 	"spacemoon/network/post"
 	"strings"
 )
 
 type handler struct {
-	persistence          network.Persistence
+	persistence          Persistence
 	writer               http.ResponseWriter
 	request              *http.Request
 	loginPersistence     login.Persistence
-	mediaFilePersistence network.MediaFilePersistence
+	mediaFilePersistence MediaFilePersistence
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -57,25 +56,30 @@ func (h handler) Post() {
 	}
 
 	err = h.request.ParseMultipartForm(32 << 20)
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), "EOF") {
 		h.writer.WriteHeader(http.StatusBadRequest)
 		_, _ = h.writer.Write([]byte(err.Error()))
 		return
 	}
 
-	manager := network.NewMediaContentManager(h.persistence, h.mediaFilePersistence)
+	manager := NewMediaContentManager(h.persistence, h.mediaFilePersistence)
 	caption := post.Caption(h.request.FormValue("caption"))
-	newPost := network.NewPost(caption, user, nil)
-	fileHeaders := h.request.MultipartForm.File["media"]
+	newPost := NewPost(caption, user, nil)
+
 	files := make(map[string]io.Reader)
-	for _, header := range fileHeaders {
-		file, err := header.Open()
-		if err != nil {
-			h.writer.WriteHeader(http.StatusBadRequest)
-			_, _ = h.writer.Write([]byte(err.Error()))
-			return
+	if h.request.MultipartForm != nil {
+		fileHeaders, exists := h.request.MultipartForm.File["media"]
+		if exists {
+			for _, header := range fileHeaders {
+				file, err := header.Open()
+				if err != nil {
+					h.writer.WriteHeader(http.StatusBadRequest)
+					_, _ = h.writer.Write([]byte(err.Error()))
+					return
+				}
+				files[header.Filename] = file
+			}
 		}
-		files[header.Filename] = file
 	}
 
 	err = manager.SaveNewPostWithMedia(newPost, files)
@@ -87,6 +91,6 @@ func (h handler) Post() {
 	h.writer.WriteHeader(http.StatusAccepted)
 }
 
-func New(np network.Persistence, lp login.Persistence, mfp network.MediaFilePersistence) http.Handler {
+func New(np Persistence, lp login.Persistence, mfp MediaFilePersistence) http.Handler {
 	return handler{persistence: np, loginPersistence: lp, mediaFilePersistence: mfp}
 }

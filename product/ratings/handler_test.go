@@ -1,10 +1,10 @@
-package product_handler
+package ratings
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"spacemoon/product/ratings"
 	"strings"
 	"testing"
 )
@@ -20,9 +20,9 @@ func TestMakeRatingsHandler(t *testing.T) {
 		t.Fatalf("unexpected header: %d", spy.header)
 	}
 
-	var rating ratings.Rating
+	var rating Rating
 	_ = json.Unmarshal([]byte(strings.TrimSuffix(spy.written, "{written:")), &rating)
-	var expectedRating = ratings.Rating{
+	var expectedRating = Rating{
 		History: nil,
 		Score:   0,
 	}
@@ -51,4 +51,23 @@ func TestMakeRatingsHandler(t *testing.T) {
 	if rating.Score != 3 {
 		t.Fatalf("bad response: %+v", postSpy)
 	}
+}
+
+type spyWriter struct {
+	written string
+	header  int
+}
+
+func (s *spyWriter) Header() http.Header {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *spyWriter) Write(bytes []byte) (int, error) {
+	s.written = s.written + fmt.Sprintf("%s", bytes)
+	return len(bytes), nil
+}
+
+func (s *spyWriter) WriteHeader(h int) {
+	s.header = h
 }

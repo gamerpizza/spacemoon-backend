@@ -1,4 +1,4 @@
-package category_handler
+package category
 
 import (
 	"bytes"
@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"spacemoon/product"
-	"spacemoon/product/category"
 	"strings"
 	"testing"
 )
@@ -69,7 +68,7 @@ func TestCategory_DELETE_PRODUCT(t *testing.T) {
 	checkThatTheProductIsNotFoundOnTheCategory(t, h, testCategory, testProductJSON)
 }
 
-func makeExpectedResultJSON(t *testing.T, testCategory category.DTO) []byte {
+func makeExpectedResultJSON(t *testing.T, testCategory DTO) []byte {
 	testCategory.Products = product.Products{}
 	expectedCategory, err := json.Marshal(testCategory)
 	if err != nil {
@@ -78,7 +77,7 @@ func makeExpectedResultJSON(t *testing.T, testCategory category.DTO) []byte {
 	return expectedCategory
 }
 
-func deleteProduct(t *testing.T, h http.Handler, testCategory category.DTO, productId product.Id) {
+func deleteProduct(t *testing.T, h http.Handler, testCategory DTO, productId product.Id) {
 	deleteProductRequest, err := http.NewRequest(http.MethodDelete,
 		fmt.Sprintf("/category?name=%s&product_id=%s", testCategory.Name, productId),
 		http.NoBody)
@@ -88,13 +87,13 @@ func deleteProduct(t *testing.T, h http.Handler, testCategory category.DTO, prod
 	h.ServeHTTP(&spyWriter{}, deleteProductRequest)
 }
 
-func performRequestToGetCategoryByName(t *testing.T, h http.Handler, spy *spyWriter, categoryName category.Name) {
+func performRequestToGetCategoryByName(t *testing.T, h http.Handler, spy *spyWriter, categoryName Name) {
 	request := makeRequestToGetCategoryByName(t, categoryName)
 	h.ServeHTTP(spy, request)
 }
 
 func validateExpectedCategoryFromStubPersistenceInResponse(t *testing.T, spy *spyWriter, expectedCategory string) {
-	expectedCategoryJSON, err := json.Marshal(expectedCategories[category.Name(expectedCategory)])
+	expectedCategoryJSON, err := json.Marshal(expectedCategories[Name(expectedCategory)])
 	if err != nil {
 		t.Fatalf("could not parse expected category: %s", err.Error())
 	}
@@ -103,7 +102,7 @@ func validateExpectedCategoryFromStubPersistenceInResponse(t *testing.T, spy *sp
 	}
 }
 
-func makeRequestToGetCategoryByName(t *testing.T, categoryName category.Name) *http.Request {
+func makeRequestToGetCategoryByName(t *testing.T, categoryName Name) *http.Request {
 
 	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/category?name=\"%s\"", categoryName), http.NoBody)
 	if err != nil {
@@ -126,9 +125,9 @@ func makePOSTRequest(t *testing.T, marshal []byte) *http.Request {
 	return request
 }
 
-func createTestCategory(t *testing.T) (category.DTO, []byte) {
+func createTestCategory(t *testing.T) (DTO, []byte) {
 	const testCategoryName = "Products for Astronauts"
-	testCategory := category.DTO{
+	testCategory := DTO{
 		Name: testCategoryName,
 	}
 	categoryJSON, err := json.Marshal(testCategory)
@@ -138,14 +137,14 @@ func createTestCategory(t *testing.T) (category.DTO, []byte) {
 	return testCategory, categoryJSON
 }
 
-func validateSavedCategory(t *testing.T, h http.Handler, spy spyWriter, testCategory category.DTO, expectedCategoryJSON []byte) {
+func validateSavedCategory(t *testing.T, h http.Handler, spy spyWriter, testCategory DTO, expectedCategoryJSON []byte) {
 	performRequestToGetCategoryByName(t, h, &spy, testCategory.Name)
 	if fmt.Sprintf("%s", spy.written) != fmt.Sprintf("%s\n", expectedCategoryJSON) {
 		t.Fatalf("did not retrieve expected category, \nexpected '%s'\nreceived '%s'\n", expectedCategoryJSON, spy.written)
 	}
 }
 
-func postNewCategory(t *testing.T) (http.Handler, category.DTO, []byte) {
+func postNewCategory(t *testing.T) (http.Handler, DTO, []byte) {
 	h := MakeHandler(&fakePersistence{})
 	postSpy := spyWriter{}
 	testCategory, expectedCategoryJSON := createTestCategory(t)
@@ -155,7 +154,7 @@ func postNewCategory(t *testing.T) (http.Handler, category.DTO, []byte) {
 	return h, testCategory, expectedCategoryJSON
 }
 
-func addProductToCategory(t *testing.T, testCategory category.DTO, h http.Handler) ([]byte, product.Id) {
+func addProductToCategory(t *testing.T, testCategory DTO, h http.Handler) ([]byte, product.Id) {
 	testProduct, err := product.New("test product", 1000, "a test product", "")
 	if err != nil {
 		t.Fatalf("could not create test product: %s", err.Error())
@@ -173,7 +172,7 @@ func addProductToCategory(t *testing.T, testCategory category.DTO, h http.Handle
 	return testProductJSON, testProduct.GetId()
 }
 
-func checkThatTheProductIsFoundOnTheCategory(t *testing.T, h http.Handler, testCategory category.DTO, testProductJSON []byte) {
+func checkThatTheProductIsFoundOnTheCategory(t *testing.T, h http.Handler, testCategory DTO, testProductJSON []byte) {
 	newSpy := spyWriter{}
 	performRequestToGetCategoryByName(t, h, &newSpy, testCategory.Name)
 	if !strings.Contains(fmt.Sprintf("%s", newSpy.written), string(testProductJSON)) {
@@ -181,7 +180,7 @@ func checkThatTheProductIsFoundOnTheCategory(t *testing.T, h http.Handler, testC
 	}
 }
 
-func checkThatTheProductIsNotFoundOnTheCategory(t *testing.T, h http.Handler, testCategory category.DTO, testProductJSON []byte) {
+func checkThatTheProductIsNotFoundOnTheCategory(t *testing.T, h http.Handler, testCategory DTO, testProductJSON []byte) {
 	newSpy := spyWriter{}
 	performRequestToGetCategoryByName(t, h, &newSpy, testCategory.Name)
 	if strings.Contains(fmt.Sprintf("%s", newSpy.written), string(testProductJSON)) {
@@ -189,7 +188,7 @@ func checkThatTheProductIsNotFoundOnTheCategory(t *testing.T, h http.Handler, te
 	}
 }
 
-func deleteCategory(t *testing.T, h http.Handler, name category.Name) {
+func deleteCategory(t *testing.T, h http.Handler, name Name) {
 	deleteRequest, err := http.NewRequest(http.MethodDelete, string("/category?name="+name), http.NoBody)
 	if err != nil {
 		t.Fatalf("could not create request to delete category: %s", err.Error())
@@ -197,7 +196,7 @@ func deleteCategory(t *testing.T, h http.Handler, name category.Name) {
 	h.ServeHTTP(&spyWriter{}, deleteRequest)
 }
 
-func validateCategoryDeletion(t *testing.T, h http.Handler, testCategory category.DTO, expectedCategoryJSON []byte) {
+func validateCategoryDeletion(t *testing.T, h http.Handler, testCategory DTO, expectedCategoryJSON []byte) {
 	newSpy := spyWriter{}
 	performRequestToGetCategoryByName(t, h, &newSpy, testCategory.Name)
 	if bytes.Contains(newSpy.written, expectedCategoryJSON) {
@@ -227,53 +226,53 @@ func (s *spyWriter) WriteHeader(h int) {
 type stubPersistence struct {
 }
 
-func (s stubPersistence) DeleteCategory(name category.Name) {
+func (s stubPersistence) DeleteCategory(name Name) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s stubPersistence) SaveCategory(dto category.DTO) {
+func (s stubPersistence) SaveCategory(dto DTO) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s stubPersistence) GetCategories() category.Categories {
+func (s stubPersistence) GetCategories() Categories {
 	return expectedCategories
 }
 
 type fakePersistence struct {
-	categories category.Categories
+	categories Categories
 }
 
-func (f *fakePersistence) DeleteCategory(name category.Name) {
+func (f *fakePersistence) DeleteCategory(name Name) {
 	delete(f.categories, name)
 }
 
-func (f *fakePersistence) SaveCategory(dto category.DTO) {
+func (f *fakePersistence) SaveCategory(dto DTO) {
 	if f.categories == nil {
-		f.categories = make(category.Categories)
+		f.categories = make(Categories)
 	}
 	f.categories[dto.Name] = dto
 
 }
 
-func (f *fakePersistence) GetCategories() category.Categories {
+func (f *fakePersistence) GetCategories() Categories {
 	return f.categories
 }
 
-var expectedCategories category.Categories = category.Categories{}
+var expectedCategories Categories = Categories{}
 var expectedCategoriesJSON []byte
 
 func init() {
-	expectedCategories["cool products"] = category.DTO{
+	expectedCategories["cool products"] = DTO{
 		Name:     "cool products",
 		Products: nil,
 	}
-	expectedCategories["hot products"] = category.DTO{
+	expectedCategories["hot products"] = DTO{
 		Name:     "hot products",
 		Products: nil,
 	}
-	expectedCategories["amazing products"] = category.DTO{
+	expectedCategories["amazing products"] = DTO{
 		Name:     "amazing products",
 		Products: nil,
 	}

@@ -1,20 +1,19 @@
-package category_handler
+package category
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"spacemoon/product"
-	"spacemoon/product/category"
 	"strings"
 )
 
-func MakeHandler(p category.Persistence) http.Handler {
+func MakeHandler(p Persistence) http.Handler {
 	return handler{persistence: p}
 }
 
 type handler struct {
-	persistence category.Persistence
+	persistence Persistence
 	writer      http.ResponseWriter
 	request     *http.Request
 }
@@ -38,7 +37,7 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (h handler) getCategories() {
 	name := h.getNameFromRequest()
-	var c category.Categories = h.persistence.GetCategories()
+	var c Categories = h.persistence.GetCategories()
 	if isNotSet(name) {
 		h.respondWithAllCategories(c)
 		return
@@ -62,7 +61,7 @@ func (h handler) addProductToCategory() {
 	if h.checkIfNameIsInvalid(name) {
 		return
 	}
-	cat, exists := h.persistence.GetCategories()[category.Name(name)]
+	cat, exists := h.persistence.GetCategories()[Name(name)]
 	if !exists {
 		h.writer.WriteHeader(http.StatusNotFound)
 		_, _ = h.writer.Write([]byte("category not found"))
@@ -76,7 +75,7 @@ func (h handler) addProductToCategory() {
 }
 
 func (h handler) delete() {
-	var name category.Name = category.Name(h.request.FormValue("name"))
+	var name Name = Name(h.request.FormValue("name"))
 	if isNotSet(string(name)) {
 		h.writer.WriteHeader(http.StatusBadRequest)
 		_, _ = h.writer.Write([]byte("you did not specify the name of the category to be deleted"))
@@ -91,7 +90,7 @@ func (h handler) delete() {
 	h.writer.WriteHeader(http.StatusNoContent)
 }
 
-func (h handler) addProductAndSave(cat category.DTO, p product.Dto) {
+func (h handler) addProductAndSave(cat DTO, p product.Dto) {
 	cat.AddProduct(&p)
 	h.persistence.SaveCategory(cat)
 	h.writer.WriteHeader(http.StatusNoContent)
@@ -106,18 +105,18 @@ func (h handler) checkIfNameIsInvalid(name string) bool {
 	return false
 }
 
-func (h handler) saveNewCategory(c category.DTO) {
+func (h handler) saveNewCategory(c DTO) {
 	h.persistence.SaveCategory(c)
 	h.writer.WriteHeader(http.StatusCreated)
 }
 
-func (h handler) getCategoryFromRequestBody() (category.DTO, bool) {
-	var c category.DTO
+func (h handler) getCategoryFromRequestBody() (DTO, bool) {
+	var c DTO
 	err := json.NewDecoder(h.request.Body).Decode(&c)
 	if err != nil {
 		h.writer.WriteHeader(http.StatusBadRequest)
 		_, _ = h.writer.Write([]byte(err.Error()))
-		return category.DTO{}, true
+		return DTO{}, true
 	}
 	return c, false
 }
@@ -133,20 +132,20 @@ func (h handler) getProductFromRequestBody() (product.Dto, bool) {
 	return p, false
 }
 
-func (h handler) respondWithSpecificCategory(c category.Categories, name string) {
+func (h handler) respondWithSpecificCategory(c Categories, name string) {
 	h.writer.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(h.writer).Encode(c[category.Name(name)])
+	_ = json.NewEncoder(h.writer).Encode(c[Name(name)])
 }
 
-func (h handler) validateThatACategoryExistsWithThatName(c category.Categories, name string) bool {
-	if _, exists := c[category.Name(name)]; !exists {
+func (h handler) validateThatACategoryExistsWithThatName(c Categories, name string) bool {
+	if _, exists := c[Name(name)]; !exists {
 		h.writer.WriteHeader(http.StatusNotFound)
 		return true
 	}
 	return false
 }
 
-func (h handler) respondWithAllCategories(c category.Categories) {
+func (h handler) respondWithAllCategories(c Categories) {
 	encoder := json.NewEncoder(h.writer)
 	h.writer.WriteHeader(http.StatusOK)
 	_ = encoder.Encode(c)
@@ -166,7 +165,7 @@ func (h handler) getNameFromRequest() string {
 	return name
 }
 
-func (h handler) deleteProductFromCategory(name category.Name, productId product.Id) {
+func (h handler) deleteProductFromCategory(name Name, productId product.Id) {
 	cat, exists := h.persistence.GetCategories()[name]
 	if !exists {
 		h.writer.WriteHeader(http.StatusNotFound)
