@@ -112,7 +112,7 @@ func (h handler) toggleLike() {
 		return
 	}
 
-	_, isLiked := p.Likes[user]
+	_, isLiked := p.Likes[string(user)]
 	if newIsLiked := !isLiked; isLiked {
 		p.RemoveLike(user)
 
