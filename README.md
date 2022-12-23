@@ -23,6 +23,13 @@ Right now, it is using PORT 1234 to receive the requests.
 * Image and Video on social media posts
 * Comments on social media posts
 
+##  [v1.0.1] - _2022 12 23_
+### Added
+* check if user exists before creating it
+### Fixed
+* changed post uri to string for Google storage
+* added error handling on file saving
+
 ##  [v1.0.0] - _2022 12 22_
 ### Added
 * Save image and ad URLs to post
