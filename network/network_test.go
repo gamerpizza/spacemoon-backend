@@ -6,8 +6,8 @@ import (
 )
 
 func TestNetwork(t *testing.T) {
-	const user = "Edgar Allan Post"
-	var n Network = New(&mockPersistence{}, user)
+	const user = "Edgar Allan post"
+	var n PostManager = NewPostManager(&mockPersistence{}, user)
 	const caption = "something"
 	const imageUrl1 = "image-url-1"
 	const imageUrl2 = "image-url-2"
@@ -40,34 +40,18 @@ func TestNetwork(t *testing.T) {
 }
 
 func TestNetwork_GetPosts(t *testing.T) {
-	const user = "Edgar Allan Post"
-	var n Network = New(&mockPersistence{}, user)
+	const user = "Edgar Allan post"
+	var n PostManager = NewPostManager(&mockPersistence{}, user)
 	const caption1 = "something"
 	const caption2 = "something other"
 	post1, _ := n.Post(caption1)
 	post2, _ := n.Post(caption2)
 	var retrievedPosts, _ = n.GetPosts()
-	if _, exists := retrievedPosts[post1.GetId()]; !exists || retrievedPosts[post1.GetId()].GetCaption() != caption1 {
+	if retrieved, exists := retrievedPosts[post1.GetId()]; !exists || retrieved.GetCaption() != caption1 {
 		t.Fatal("posted post not found")
 	}
-	if _, exists := retrievedPosts[post2.GetId()]; !exists || retrievedPosts[post2.GetId()].GetCaption() != caption2 {
+	if retrieved, exists := retrievedPosts[post2.GetId()]; !exists || retrieved.GetCaption() != caption2 {
 		t.Fatal("posted post not found")
 	}
 
-}
-
-type mockPersistence struct {
-	posts post.Posts
-}
-
-func (m *mockPersistence) GetAllPosts() (post.Posts, error) {
-	return m.posts, nil
-}
-
-func (m *mockPersistence) AddPost(p post.Post) error {
-	if m.posts == nil {
-		m.posts = make(post.Posts)
-	}
-	m.posts[p.GetId()] = p
-	return nil
 }
