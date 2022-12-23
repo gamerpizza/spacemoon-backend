@@ -55,12 +55,12 @@ func (p *fireStorePersistence) GetAllPosts() (post.Posts, error) {
 	posts := post.Posts{}
 
 	for _, document := range documents {
-		var post post.Post
-		err = document.DataTo(&post)
+		var pst post.Post
+		err = document.DataTo(&pst)
 		if err != nil {
 			return nil, fmt.Errorf("could parse document: %w", err)
 		}
-		posts[post.GetId()] = post
+		posts[pst.GetId()] = pst
 	}
 	return posts, nil
 }
@@ -96,6 +96,5 @@ func (p *fireStorePersistence) SaveRating(id product.Id, rating ratings.Rating) 
 	panic("implement me")
 }
 
-const loginCollection = "login"
 const productCollection = "products"
 const postsCollection = "posts"

@@ -11,13 +11,13 @@ func New(p Persistence, user login.UserName) Network {
 	return poster{persistence: p, user: user}
 }
 
-func NewPost(caption post.Caption, author login.UserName, urls post.ContentURLS) post.Post {
+func NewPost(caption post.Caption, author login.UserName, urls post.ContentURIS) post.Post {
 	var id = post.Id(uuid.NewString())
 	return post.Post{Caption: caption, Author: author, URLS: urls, Id: id, Created: time.Now()}
 }
 
 type Network interface {
-	Post(caption post.Caption, content ...post.ContentURI) (post.Post, error) //content
+	Post(caption post.Caption, content ...string) (post.Post, error) //content
 	GetPosts() (post.Posts, error)
 }
 
@@ -36,7 +36,7 @@ func (p poster) GetPosts() (posts post.Posts, err error) {
 	return
 }
 
-func (p poster) Post(c post.Caption, content ...post.ContentURI) (post.Post, error) {
+func (p poster) Post(c post.Caption, content ...string) (post.Post, error) {
 	pst := p.makePost(c, content)
 	err := p.persistence.AddPost(pst)
 	if err != nil {
@@ -45,10 +45,10 @@ func (p poster) Post(c post.Caption, content ...post.ContentURI) (post.Post, err
 	return pst, nil
 }
 
-func (p poster) makePost(c post.Caption, content []post.ContentURI) post.Post {
-	urls := make(post.ContentURLS)
+func (p poster) makePost(c post.Caption, content []string) post.Post {
+	urls := make(post.ContentURIS)
 	for _, url := range content {
-		urls[url] = nil
+		urls[url] = true
 	}
 
 	pst := NewPost(c, p.user, urls)

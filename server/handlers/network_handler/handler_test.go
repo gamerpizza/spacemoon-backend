@@ -150,17 +150,17 @@ func (f stubLoginPersistence) DeleteUser(name login.UserName) error {
 type stubMediaFilePersistence struct {
 }
 
-func (s stubMediaFilePersistence) SaveFiles(files map[string]io.Reader, prefix string) (post.ContentURLS, error) {
+func (s stubMediaFilePersistence) SaveFiles(files map[string]io.Reader, prefix string) (post.ContentURIS, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s stubMediaFilePersistence) GetFile(uri post.ContentURI) (io.Reader, error) {
+func (s stubMediaFilePersistence) GetFile(uri string) (io.Reader, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s stubMediaFilePersistence) Delete(uri post.ContentURI) error {
+func (s stubMediaFilePersistence) Delete(uri string) error {
 	//TODO implement me
 	panic("implement me")
 }

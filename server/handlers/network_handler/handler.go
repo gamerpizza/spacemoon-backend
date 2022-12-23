@@ -77,6 +77,7 @@ func (h handler) Post() {
 		}
 		files[header.Filename] = file
 	}
+
 	err = manager.SaveNewPostWithMedia(newPost, files)
 	if err != nil {
 		h.writer.WriteHeader(http.StatusInternalServerError)

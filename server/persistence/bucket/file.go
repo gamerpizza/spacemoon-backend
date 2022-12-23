@@ -29,7 +29,7 @@ type persistence struct {
 	ctx    context.Context
 }
 
-func (p persistence) Delete(uri post.ContentURI) error {
+func (p persistence) Delete(uri string) error {
 	err := p.bucket.Object(string(uri)).Delete(p.ctx)
 	if err != nil {
 		return fmt.Errorf("could not delete from storage: %w", err)
@@ -37,14 +37,14 @@ func (p persistence) Delete(uri post.ContentURI) error {
 	return nil
 }
 
-func (p persistence) SaveFiles(files map[string]io.Reader, prefix string) (post.ContentURLS, error) {
-	urls := post.ContentURLS{}
+func (p persistence) SaveFiles(files map[string]io.Reader, prefix string) (post.ContentURIS, error) {
+	urls := post.ContentURIS{}
 	generator := newUriGenerator()
 
 	for name, file := range files {
 		fileName := strings.Split(name, ".")
 		fileExt := strings.ToLower(fileName[len(fileName)-1])
-		u := post.ContentURI(prefix + string(generator.newToken()) + "." + fileExt)
+		u := prefix + string(generator.newToken()) + "." + fileExt
 
 		w := p.bucket.Object(string(u)).NewWriter(p.ctx)
 
@@ -56,14 +56,14 @@ func (p persistence) SaveFiles(files map[string]io.Reader, prefix string) (post.
 		if err != nil {
 			return nil, fmt.Errorf("could not close file on cloud: %w", err)
 		}
-		urls[u] = nil
+		urls[u] = true
 	}
 	return urls, nil
 
 }
 
-func (p persistence) GetFile(u post.ContentURI) (io.Reader, error) {
-	reader, err := p.bucket.Object(string(u)).NewReader(p.ctx)
+func (p persistence) GetFile(uri string) (io.Reader, error) {
+	reader, err := p.bucket.Object(uri).NewReader(p.ctx)
 	if err != nil {
 		return nil, fmt.Errorf("could not create object reader: %w", err)
 	}

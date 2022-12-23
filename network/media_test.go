@@ -68,24 +68,24 @@ func getTestImageFiles(t *testing.T) (*os.File, *os.File, error) {
 }
 
 type fakeMediaFilePersistence struct {
-	files map[post.ContentURI]io.Reader
+	files map[string]io.Reader
 }
 
-func (s *fakeMediaFilePersistence) GetFile(url post.ContentURI) (io.Reader, error) {
+func (s *fakeMediaFilePersistence) GetFile(url string) (io.Reader, error) {
 	return s.files[url], nil
 }
 
-func (s *fakeMediaFilePersistence) Delete(url post.ContentURI) error {
+func (s *fakeMediaFilePersistence) Delete(url string) error {
 	//TODO implement me
 	panic("implement me")
 	return nil
 }
 
-func (s *fakeMediaFilePersistence) SaveFiles(files map[string]io.Reader, prefix string) (post.ContentURLS, error) {
-	urls := post.ContentURLS{}
+func (s *fakeMediaFilePersistence) SaveFiles(files map[string]io.Reader, prefix string) (post.ContentURIS, error) {
+	urls := post.ContentURIS{}
 	generator := login.NewTokenGenerator()
 	if s.files == nil {
-		s.files = make(map[post.ContentURI]io.Reader)
+		s.files = make(map[string]io.Reader)
 	}
 	for name, file := range files {
 		fileName := strings.Split(name, ".")
@@ -93,9 +93,9 @@ func (s *fakeMediaFilePersistence) SaveFiles(files map[string]io.Reader, prefix 
 		if _, isAccepted := acceptedFileTypes[fileExt]; !isAccepted {
 			continue
 		}
-		url := post.ContentURI(prefix + string(generator.NewToken(8)) + string(fileExt))
+		url := prefix + string(generator.NewToken(8)) + string(fileExt)
 		s.files[url] = file
-		urls[url] = nil
+		urls[url] = true
 	}
 	return urls, nil
 }

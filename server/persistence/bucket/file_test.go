@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"spacemoon/network"
-	"spacemoon/network/post"
 	"testing"
 )
 
@@ -25,7 +24,7 @@ func TestName(t *testing.T) {
 	files := make(map[string]io.Reader)
 	files[f.Name()] = f
 	urlsMap, _ := p.SaveFiles(files, "/test/")
-	var urls []post.ContentURI
+	var urls []string
 	for url := range urlsMap {
 		urls = append(urls, url)
 	}
