@@ -56,4 +56,6 @@ type Caption string
 // Id is a unique UUID string to identify every Post
 type Id string
 type Posts map[Id]Post
-type Likes map[login.UserName]bool
+
+// Likes uses a string as a login.UserName to work with Google Cloud without a driver
+type Likes map[string]bool
