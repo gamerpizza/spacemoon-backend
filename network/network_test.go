@@ -6,7 +6,7 @@ import (
 )
 
 func TestNetwork(t *testing.T) {
-	const user = "Edgar Allan Post"
+	const user = "Edgar Allan post"
 	var n PostManager = NewPostManager(&mockPersistence{}, user)
 	const caption = "something"
 	const imageUrl1 = "image-url-1"
@@ -40,7 +40,7 @@ func TestNetwork(t *testing.T) {
 }
 
 func TestNetwork_GetPosts(t *testing.T) {
-	const user = "Edgar Allan Post"
+	const user = "Edgar Allan post"
 	var n PostManager = NewPostManager(&mockPersistence{}, user)
 	const caption1 = "something"
 	const caption2 = "something other"

@@ -51,14 +51,10 @@ func TestHandler_ServeHTTP_GetShouldReturnAListOfPosts(t *testing.T) {
 
 func TestHandler_ServeHTTP_PostShouldSaveAPost(t *testing.T) {
 	h := New(&mockPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
-	const testCaption = "some caption"
-
-	p := NewPost(testCaption, testAuthor, nil)
-
-	form := url.Values{}
-	form.Add("caption", testCaption)
 	postRequest := httptest.NewRequest(http.MethodPost, "/", http.NoBody)
 	postRequest.Header.Set("Content-Type", "multipart/form-data; boundary=*")
+	form := url.Values{}
+	form.Add("caption", testCaption)
 	postRequest.Form = form
 	postRecorder := httptest.NewRecorder()
 	h.ServeHTTP(postRecorder, postRequest)
@@ -79,15 +75,41 @@ func TestHandler_ServeHTTP_PostShouldSaveAPost(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
-	found := false
-	for _, pst := range posts {
-		if pst.GetCaption() == testCaption && p.GetAuthor() == testAuthor {
-			found = true
-			break
+	var newPostId post.Id = ""
+	for id, p := range posts {
+		if p.GetCaption() == testCaption {
+			newPostId = id
 		}
 	}
-	if !found {
-		t.Fatal("post not found")
+
+	putRequest := httptest.NewRequest(http.MethodPut, "/?id="+string(newPostId), http.NoBody)
+	putRecorder := httptest.NewRecorder()
+	h.ServeHTTP(putRecorder, putRequest)
+	if code := putRecorder.Code; code != http.StatusOK {
+		t.Fatalf("unexpected status: %d - %s", code, putRecorder.Body.Bytes())
+	}
+
+	var isLiked bool
+	err = json.Unmarshal(putRecorder.Body.Bytes(), &isLiked)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	if !isLiked {
+		t.Fatal("post should be liked")
+	}
+
+	secondPutRequest := httptest.NewRequest(http.MethodPut, "/like?id="+string(newPostId), http.NoBody)
+	secondPutRecorder := httptest.NewRecorder()
+	h.ServeHTTP(secondPutRecorder, secondPutRequest)
+	if code := secondPutRecorder.Code; code != http.StatusOK {
+		t.Fatalf("unexpected status: %d - %s", code, secondPutRecorder.Body.Bytes())
+	}
+	err = json.Unmarshal(secondPutRecorder.Body.Bytes(), &isLiked)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	if isLiked {
+		t.Fatalf("post should not be liked anymore %s", secondPutRecorder.Body.Bytes())
 	}
 }
 
@@ -109,6 +131,10 @@ func TestHandler_ServeHTTP_PostFailsOnLoginPersistenceFail(t *testing.T) {
 	if recorder.Code >= 200 && recorder.Code < 300 {
 		t.Fatalf("error not thrown: %+v", recorder)
 	}
+}
+
+func TestHandler_ServeHTTP_PutFlipsLikedState(t *testing.T) {
+
 }
 
 type failPersistence struct {
@@ -228,6 +254,7 @@ func (s stubMediaFilePersistence) Delete(uri string) error {
 	panic("implement me")
 }
 
-const testAuthor = "Edgar Allan Post"
+const testAuthor = "Edgar Allan post"
+const testCaption = "some caption"
 
 var fakeError = errors.New("some fake error")

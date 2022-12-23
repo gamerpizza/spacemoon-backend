@@ -39,7 +39,7 @@ func setupHandlers() {
 	socialNetworkHandler := network.New(getSocialNetworkPersistence(), loginPersistence, mediaFilePersistence)
 	protectedSocialNetworkHandler := protector.Protect(&socialNetworkHandler)
 	protectedSocialNetworkHandler.Unprotect(http.MethodGet)
-	corsEnabledSocialNetworkHandler := cors.EnableCors(protectedSocialNetworkHandler, http.MethodGet, http.MethodPost)
+	corsEnabledSocialNetworkHandler := cors.EnableCors(protectedSocialNetworkHandler, http.MethodGet, http.MethodPost, http.MethodPut)
 	http.Handle("/posts", corsEnabledSocialNetworkHandler)
 
 	productHandler := product.MakeHandler(getProductPersistence(), loginPersistence)
