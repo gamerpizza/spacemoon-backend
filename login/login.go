@@ -6,6 +6,7 @@ package login
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -18,6 +19,7 @@ type Persistence interface {
 	SignUpUser(u UserName, p Password) error
 	ValidateCredentials(u UserName, p Password) bool
 	DeleteUser(UserName) error
+	Check(UserName) (bool, error)
 }
 
 // NewHandler generates a login handler with a reference to the authorization Persistence and a time.Duration
@@ -88,6 +90,12 @@ func (h *handler) signup() {
 	if err != nil {
 		h.writer.WriteHeader(http.StatusBadRequest)
 		_, _ = h.writer.Write([]byte(err.Error()))
+		return
+	}
+	var exists, _ = h.persistence.Check(u.UserName)
+	if exists {
+		h.writer.WriteHeader(http.StatusBadRequest)
+		_, _ = h.writer.Write([]byte(fmt.Sprintf("username %s is already in use", u.UserName)))
 		return
 	}
 	err = h.persistence.SignUpUser(u.UserName, u.Password)

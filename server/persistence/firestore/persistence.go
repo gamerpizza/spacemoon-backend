@@ -96,6 +96,5 @@ func (p *fireStorePersistence) SaveRating(id product.Id, rating ratings.Rating) 
 	panic("implement me")
 }
 
-const loginCollection = "login"
 const productCollection = "products"
 const postsCollection = "posts"

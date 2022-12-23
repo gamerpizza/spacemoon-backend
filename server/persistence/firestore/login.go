@@ -3,6 +3,8 @@ package firestore
 import (
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"spacemoon/login"
 	"time"
 )
@@ -89,4 +91,21 @@ func (p *fireStorePersistence) DeleteUser(name login.UserName) error {
 	return nil
 }
 
+func (p *fireStorePersistence) Check(name login.UserName) (bool, error) {
+	collection := p.storage.Collection(loginCollection)
+	get, err := collection.Doc(string(name)).Get(p.ctx)
+	if status.Code(err) == codes.NotFound {
+		return false, nil
+	} else if err != nil {
+		return false, fmt.Errorf("could not check user: %w", err)
+	}
+	var u login.User
+	err = get.DataTo(&u)
+	if err != nil {
+		return false, fmt.Errorf("could parse user to check: %w", err)
+	}
+	return true, nil
+}
+
 const loginTokensCollection = "login-tokens"
+const loginCollection = "login"

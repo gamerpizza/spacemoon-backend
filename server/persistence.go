@@ -144,6 +144,11 @@ type temporaryLoginPersistence struct {
 	tokens login.Tokens
 }
 
+func (t *temporaryLoginPersistence) Check(name login.UserName) (bool, error) {
+	_, exists := t.users[name]
+	return exists, nil
+}
+
 func (t *temporaryLoginPersistence) DeleteUser(name login.UserName) error {
 	//TODO implement me
 	panic("implement me")
