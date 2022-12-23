@@ -39,11 +39,11 @@ func (p *Post) AddLike(u login.UserName) {
 	if p.Likes == nil {
 		p.Likes = make(Likes)
 	}
-	p.Likes[u] = true
+	p.Likes[string(u)] = true
 }
 
 func (p *Post) RemoveLike(u login.UserName) {
-	delete(p.Likes, u)
+	delete(p.Likes, string(u))
 }
 
 func (p *Post) GetLikes() Likes {
