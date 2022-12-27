@@ -36,6 +36,15 @@ type fireStorePersistence struct {
 	ctx     context.Context
 }
 
+func (p *fireStorePersistence) DeletePost(id post.Id) error {
+	collection := p.storage.Collection(postsCollection)
+	_, err := collection.Doc(string(id)).Delete(p.ctx)
+	if err != nil {
+		return fmt.Errorf("could not delete from collection: %w", err)
+	}
+	return nil
+}
+
 func (p *fireStorePersistence) AddPost(post post.Post) error {
 	collection := p.storage.Collection(postsCollection)
 	_, err := collection.Doc(string(post.GetId())).Set(p.ctx, post)

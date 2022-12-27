@@ -1,21 +1,22 @@
-package network
+package handler
 
 import (
 	"encoding/json"
 	"io"
 	"net/http"
 	"spacemoon/login"
+	"spacemoon/network"
 	"spacemoon/network/post"
 	"strings"
 )
 
 type handler struct {
-	persistence          Persistence
+	persistence          network.Persistence
 	writer               http.ResponseWriter
 	request              *http.Request
 	loginPersistence     login.Persistence
-	mediaFilePersistence MediaFilePersistence
-	manager              MediaFileContentAdder
+	mediaFilePersistence network.MediaFilePersistence
+	manager              network.MediaFileContentAdder
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -29,6 +30,8 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.post()
 	case http.MethodPut:
 		h.toggleLike()
+	case http.MethodDelete:
+		h.delete()
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
@@ -66,7 +69,7 @@ func (h handler) post() {
 	}
 
 	caption := post.Caption(h.request.FormValue("caption"))
-	newPost := NewPost(caption, user, nil)
+	newPost := post.New(caption, user, nil)
 
 	files := make(map[string]io.Reader)
 	if h.request.MultipartForm != nil {
@@ -112,7 +115,7 @@ func (h handler) toggleLike() {
 		return
 	}
 
-	_, isLiked := p.Likes[user]
+	_, isLiked := p.Likes[string(user)]
 	if newIsLiked := !isLiked; isLiked {
 		p.RemoveLike(user)
 
@@ -135,10 +138,16 @@ func (h handler) toggleLike() {
 	}
 }
 
-func New(np Persistence, lp login.Persistence, mfp MediaFilePersistence) http.Handler {
+func (h handler) delete() {
+	id := post.Id(h.request.FormValue("id"))
+	h.persistence.DeletePost(id)
+	h.writer.WriteHeader(http.StatusNoContent)
+}
+
+func New(np network.Persistence, lp login.Persistence, mfp network.MediaFilePersistence) http.Handler {
 	return handler{
 		persistence:          np,
 		loginPersistence:     lp,
 		mediaFilePersistence: mfp,
-		manager:              NewMediaContentManager(np, mfp)}
+		manager:              network.NewMediaContentManager(np, mfp)}
 }

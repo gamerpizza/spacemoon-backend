@@ -2,6 +2,7 @@
 package post
 
 import (
+	"github.com/google/uuid"
 	"spacemoon/login"
 	"time"
 )
@@ -39,11 +40,11 @@ func (p *Post) AddLike(u login.UserName) {
 	if p.Likes == nil {
 		p.Likes = make(Likes)
 	}
-	p.Likes[u] = true
+	p.Likes[string(u)] = true
 }
 
 func (p *Post) RemoveLike(u login.UserName) {
-	delete(p.Likes, u)
+	delete(p.Likes, string(u))
 }
 
 func (p *Post) GetLikes() Likes {
@@ -56,4 +57,12 @@ type Caption string
 // Id is a unique UUID string to identify every Post
 type Id string
 type Posts map[Id]Post
-type Likes map[login.UserName]bool
+
+// Likes uses a string as a login.UserName to work with Google Cloud without a driver
+type Likes map[string]bool
+
+// New creates a new post
+func New(caption Caption, author login.UserName, urls ContentURIS) Post {
+	var id = Id(uuid.NewString())
+	return Post{Caption: caption, Author: author, URLS: urls, Id: id, Created: time.Now()}
+}

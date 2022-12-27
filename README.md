@@ -1,7 +1,9 @@
-# SpaceMoon 
-An out-of-this-world online retail space 
+# Bubblegum 
+A next-gen social media network and app 
 
 ## How to build
+Made with Go.
+
 Run `go build -o spacemoon ./server` from the root directory to build the server executable (it will be created on the 
 same root directory, with the name `server`). On windows, use `go build -o spacemoon.exe ./server` 
 (it will create `spacemoon.exe`).
@@ -16,12 +18,13 @@ Right now, it is using PORT 1234 to receive the requests.
 
 ## [Unreleased]
 ### Added
-* PayPal payment processing
-* Stripe payment processing
-* Instant Pay payment processing
-* Google Pay payment processing
-* Image and Video on social media posts
-* Comments on social media posts
+* edit posts
+* user profile
+* 1 username per person
+
+##  [v1.0.3] - _2022 12 27_
+### Added
+* delete posts
 
 ##  [v1.0.2] - _2022 12 23_
 ### Fixed

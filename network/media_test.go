@@ -104,6 +104,12 @@ type fakePersistence struct {
 	posts post.Posts
 }
 
+func (f *fakePersistence) DeletePost(post.Id) error {
+	//TODO implement me
+	panic("implement me")
+	return nil
+}
+
 func (f *fakePersistence) AddPost(p post.Post) error {
 	if f.posts == nil {
 		f.posts = map[post.Id]post.Post{}
