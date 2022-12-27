@@ -65,6 +65,11 @@ type temporarySocialNetworkPersistence struct {
 	posts post.Posts
 }
 
+func (t *temporarySocialNetworkPersistence) DeletePost(id post.Id) error {
+	delete(t.posts, id)
+	return nil
+}
+
 func (t *temporarySocialNetworkPersistence) AddPost(p post.Post) error {
 	if t.posts == nil {
 		t.posts = make(post.Posts)

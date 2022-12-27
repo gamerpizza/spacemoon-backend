@@ -37,11 +37,11 @@ func TestPoster(t *testing.T) {
 	var u login.UserName
 
 	p.AddLike(u)
-	if _, exists := p.Likes[u]; !exists {
+	if _, exists := p.Likes[string(u)]; !exists {
 		t.Fatal("like not added")
 	}
 	p.RemoveLike(u)
-	if _, exists := p.Likes[u]; exists {
+	if _, exists := p.Likes[string(u)]; exists {
 		t.Fatal("like not removed")
 	}
 	if !reflect.DeepEqual(p.Likes, p.GetLikes()) {

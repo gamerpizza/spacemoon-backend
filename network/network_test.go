@@ -5,6 +5,27 @@ import (
 	"testing"
 )
 
+type mockPersistence struct {
+	posts map[post.Id]post.Post
+}
+
+func (m *mockPersistence) AddPost(p post.Post) error {
+	if m.posts == nil {
+		m.posts = make(map[post.Id]post.Post)
+	}
+	m.posts[p.GetId()] = p
+	return nil
+}
+
+func (m *mockPersistence) GetAllPosts() (post.Posts, error) {
+	return m.posts, nil
+}
+
+func (m *mockPersistence) DeletePost(id post.Id) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func TestNetwork(t *testing.T) {
 	const user = "Edgar Allan post"
 	var n PostManager = NewPostManager(&mockPersistence{}, user)

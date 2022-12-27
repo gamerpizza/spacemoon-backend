@@ -1,21 +1,22 @@
-package network
+package handler
 
 import (
 	"encoding/json"
 	"io"
 	"net/http"
 	"spacemoon/login"
+	"spacemoon/network"
 	"spacemoon/network/post"
 	"strings"
 )
 
 type handler struct {
-	persistence          Persistence
+	persistence          network.Persistence
 	writer               http.ResponseWriter
 	request              *http.Request
 	loginPersistence     login.Persistence
-	mediaFilePersistence MediaFilePersistence
-	manager              MediaFileContentAdder
+	mediaFilePersistence network.MediaFilePersistence
+	manager              network.MediaFileContentAdder
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +69,7 @@ func (h handler) post() {
 	}
 
 	caption := post.Caption(h.request.FormValue("caption"))
-	newPost := NewPost(caption, user, nil)
+	newPost := post.New(caption, user, nil)
 
 	files := make(map[string]io.Reader)
 	if h.request.MultipartForm != nil {
@@ -138,13 +139,15 @@ func (h handler) toggleLike() {
 }
 
 func (h handler) delete() {
-	h.persistence.DeletePost()
+	id := post.Id(h.request.FormValue("id"))
+	h.persistence.DeletePost(id)
+	h.writer.WriteHeader(http.StatusNoContent)
 }
 
-func New(np Persistence, lp login.Persistence, mfp MediaFilePersistence) http.Handler {
+func New(np network.Persistence, lp login.Persistence, mfp network.MediaFilePersistence) http.Handler {
 	return handler{
 		persistence:          np,
 		loginPersistence:     lp,
 		mediaFilePersistence: mfp,
-		manager:              NewMediaContentManager(np, mfp)}
+		manager:              network.NewMediaContentManager(np, mfp)}
 }

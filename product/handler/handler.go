@@ -1,21 +1,22 @@
 // Package product_handler handles calls related to the product.
-package product
+package handler
 
 import (
 	"net/http"
 	"spacemoon/login"
+	"spacemoon/product"
 	"strings"
 )
 
 // MakeHandler creates a product handler and attributes it a Persistence. This is made to allow the Persistence
 // implementation to be easily changed dynamically.
-func MakeHandler(pp Persistence, lp login.Persistence) http.Handler {
+func MakeHandler(pp product.Persistence, lp login.Persistence) http.Handler {
 	return &handler{productPersistence: pp, loginPersistence: lp}
 }
 
 // handler handles all the calls to the server's product API
 type handler struct {
-	productPersistence Persistence
+	productPersistence product.Persistence
 	writer             http.ResponseWriter
 	request            *http.Request
 	loginPersistence   login.Persistence
@@ -77,7 +78,7 @@ func (h *handler) createProduct() {
 		_, _ = h.writer.Write([]byte(err.Error()))
 		return
 	}
-	createdProduct, err := New(newProduct.Name, newProduct.Price, newProduct.Description, user)
+	createdProduct, err := product.New(newProduct.Name, newProduct.Price, newProduct.Description, user)
 	if err != nil {
 		h.writer.WriteHeader(http.StatusBadRequest)
 		_, _ = h.writer.Write([]byte(err.Error()))

@@ -3,22 +3,14 @@
 package network
 
 import (
-	"github.com/google/uuid"
 	"spacemoon/login"
 	"spacemoon/network/post"
-	"time"
 )
 
 // NewPostManager is the only way to externally instantiate new PostManager from this package,
 // so that any user of this package has access to the PostManager only through its interface
 func NewPostManager(p Persistence, user login.UserName) PostManager {
 	return postManager{persistence: p, user: user}
-}
-
-// NewPost creates a new post
-func NewPost(caption post.Caption, author login.UserName, urls post.ContentURIS) post.Post {
-	var id = post.Id(uuid.NewString())
-	return post.Post{Caption: caption, Author: author, URLS: urls, Id: id, Created: time.Now()}
 }
 
 // PostManager gets and creates post.Posts
@@ -33,7 +25,7 @@ type PostManager interface {
 type Persistence interface {
 	AddPost(post post.Post) error
 	GetAllPosts() (post.Posts, error)
-	DeletePost()
+	DeletePost(post.Id) error
 }
 
 type postManager struct {
@@ -61,6 +53,6 @@ func (p postManager) makePost(c post.Caption, content []string) post.Post {
 		urls[url] = true
 	}
 
-	pst := NewPost(c, p.user, urls)
+	pst := post.New(c, p.user, urls)
 	return pst
 }
