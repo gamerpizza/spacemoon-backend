@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 	"spacemoon/login"
-	"spacemoon/network"
-	"spacemoon/product"
+	"spacemoon/network/handler"
 	"spacemoon/product/category"
+	handler2 "spacemoon/product/handler"
 	product_handler2 "spacemoon/product/ratings"
 	"spacemoon/server/cors"
 	"strings"
@@ -36,13 +36,14 @@ func setupHandlers() {
 	if err != nil {
 		panic(err)
 	}
-	socialNetworkHandler := network.New(getSocialNetworkPersistence(), loginPersistence, mediaFilePersistence)
+	socialNetworkHandler := handler.New(getSocialNetworkPersistence(), loginPersistence, mediaFilePersistence)
 	protectedSocialNetworkHandler := protector.Protect(&socialNetworkHandler)
 	protectedSocialNetworkHandler.Unprotect(http.MethodGet)
-	corsEnabledSocialNetworkHandler := cors.EnableCors(protectedSocialNetworkHandler, http.MethodGet, http.MethodPost, http.MethodPut)
+	corsEnabledSocialNetworkHandler := cors.EnableCors(protectedSocialNetworkHandler,
+		http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete)
 	http.Handle("/posts", corsEnabledSocialNetworkHandler)
 
-	productHandler := product.MakeHandler(getProductPersistence(), loginPersistence)
+	productHandler := handler2.MakeHandler(getProductPersistence(), loginPersistence)
 	preparedProductHandler := prepareHandler(protector, productHandler, http.MethodGet)
 	http.Handle("/product", preparedProductHandler)
 	productRatingHandler := product_handler2.MakeRankingsHandler(getProductRatingsPersistence())

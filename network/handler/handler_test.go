@@ -1,16 +1,14 @@
-package network
+package handler
 
 import (
 	"encoding/json"
 	"errors"
-	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"spacemoon/login"
 	"spacemoon/network/post"
 	"testing"
-	"time"
 )
 
 func TestNew(t *testing.T) {
@@ -50,7 +48,7 @@ func TestHandler_ServeHTTP_GetShouldReturnAListOfPosts(t *testing.T) {
 }
 
 func TestHandler_ServeHTTP_PostShouldSaveAPost(t *testing.T) {
-	h := New(&mockPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
+	h := New(&mockNetworkPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
 	postRequest := httptest.NewRequest(http.MethodPost, "/", http.NoBody)
 	postRequest.Header.Set("Content-Type", "multipart/form-data; boundary=*")
 	form := url.Values{}
@@ -114,7 +112,7 @@ func TestHandler_ServeHTTP_PostShouldSaveAPost(t *testing.T) {
 }
 
 func TestHandler_ServeHTTP_FailsOnPersistenceFail(t *testing.T) {
-	h := New(failPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
+	h := New(failNetworkPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
 	request := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
 	recorder := httptest.NewRecorder()
 	h.ServeHTTP(recorder, request)
@@ -137,122 +135,32 @@ func TestHandler_ServeHTTP_PutFlipsLikedState(t *testing.T) {
 
 }
 
-type failPersistence struct {
-}
+func TestHandler_ServeHTTP_Delete(t *testing.T) {
+	networkPersistence := &mockNetworkPersistence{}
+	testPost := post.New(testCaption, testAuthor, nil)
+	err := networkPersistence.AddPost(testPost)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 
-func (f failPersistence) AddPost(_ post.Post) error {
-	return errors.New("some fake error")
-}
-
-func (f failPersistence) GetAllPosts() (post.Posts, error) {
-	return nil, errors.New("some fake error")
-}
-
-type failLoginPersistence struct {
-}
-
-func (f failLoginPersistence) SetUserToken(_ login.UserName, _ login.Token, _ time.Duration) error {
-	return fakeError
-}
-
-func (f failLoginPersistence) GetUser(_ login.Token) (login.UserName, error) {
-	return "", fakeError
-}
-
-func (f failLoginPersistence) SignUpUser(u login.UserName, p login.Password) error {
-	return fakeError
-}
-
-func (f failLoginPersistence) ValidateCredentials(u login.UserName, p login.Password) bool {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (f failLoginPersistence) DeleteUser(name login.UserName) error {
-	return fakeError
-}
-
-func (f failLoginPersistence) Check(name login.UserName) (bool, error) {
-	return false, fakeError
-}
-
-type stubPersistence struct {
-}
-
-func (s stubPersistence) AddPost(_ post.Post) error {
-	return nil
-}
-
-func (s stubPersistence) GetAllPosts() (post.Posts, error) {
-	return expectedPosts, nil
+	h := New(networkPersistence, failLoginPersistence{}, stubMediaFilePersistence{})
+	request := httptest.NewRequest(http.MethodDelete, string("/?id="+testPost.GetId()), http.NoBody)
+	recorder := httptest.NewRecorder()
+	h.ServeHTTP(recorder, request)
+	if code := recorder.Code; code != http.StatusNoContent {
+		t.Fatalf("unexpected response status code: %d", code)
+	}
+	posts, err := networkPersistence.GetAllPosts()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	_, exists := posts[testPost.GetId()]
+	if exists {
+		t.Fatalf("post not erased: %+v", posts)
+	}
 }
 
 var expectedPosts = post.Posts{"1": post.Post{}, "2": post.Post{}}
-
-type mockPersistence struct {
-	posts post.Posts
-}
-
-func (m *mockPersistence) AddPost(p post.Post) error {
-	if m.posts == nil {
-		m.posts = make(post.Posts)
-	}
-	m.posts[p.GetId()] = p
-	return nil
-}
-
-func (m *mockPersistence) GetAllPosts() (post.Posts, error) {
-	return m.posts, nil
-}
-
-type stubLoginPersistence struct {
-}
-
-func (f stubLoginPersistence) Check(_ login.UserName) (bool, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (f stubLoginPersistence) SetUserToken(_ login.UserName, _ login.Token, _ time.Duration) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (f stubLoginPersistence) GetUser(_ login.Token) (login.UserName, error) {
-	return testAuthor, nil
-}
-
-func (f stubLoginPersistence) SignUpUser(u login.UserName, p login.Password) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (f stubLoginPersistence) ValidateCredentials(u login.UserName, p login.Password) bool {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (f stubLoginPersistence) DeleteUser(name login.UserName) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-type stubMediaFilePersistence struct {
-}
-
-func (s stubMediaFilePersistence) SaveFiles(_ map[string]io.Reader, _ string) (post.ContentURIS, error) {
-	return nil, nil
-}
-
-func (s stubMediaFilePersistence) GetFile(uri string) (io.Reader, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s stubMediaFilePersistence) Delete(uri string) error {
-	//TODO implement me
-	panic("implement me")
-}
 
 const testAuthor = "Edgar Allan post"
 const testCaption = "some caption"

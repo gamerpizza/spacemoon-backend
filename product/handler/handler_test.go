@@ -1,4 +1,4 @@
-package product
+package handler
 
 import (
 	"bytes"
@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"spacemoon/login"
+	"spacemoon/product"
 	"spacemoon/product/ratings"
 	"testing"
 	"time"
@@ -26,11 +27,11 @@ func TestHandler_ServeHTTP_Get_OneProduct(t *testing.T) {
 }
 
 func TestHandler_ServeHTTP_Post_Then_Get(t *testing.T) {
-	var fakePersistence Persistence = &fakePersistence{}
+	var fakePersistence product.Persistence = &fakePersistence{}
 	var fakeLoginPersistence login.Persistence = &fakeLoginPersistence{}
 	testHandler := MakeHandler(fakePersistence, fakeLoginPersistence)
 	const productName = "Mars rocks"
-	newProduct, err := New(productName, 1, "some description", "")
+	newProduct, err := product.New(productName, 1, "some description", "")
 	productJson, err := json.Marshal(newProduct)
 	if err != nil {
 		return
@@ -41,7 +42,7 @@ func TestHandler_ServeHTTP_Post_Then_Get(t *testing.T) {
 	if postSpy.header != http.StatusCreated {
 		t.Fatalf("did not return the expected 201 status, got %d instead", postSpy.header)
 	}
-	var postResponseProduct Dto
+	var postResponseProduct product.Dto
 	err = json.Unmarshal([]byte(postSpy.written), &postResponseProduct)
 	if err != nil {
 		t.Fatalf("could not unmarshal response: %s\n", err.Error())
@@ -54,7 +55,7 @@ func TestHandler_ServeHTTP_Post_Then_Get(t *testing.T) {
 		t.Fatalf("did not receive a 200 status, instead: %d\n", getSpy.header)
 	}
 
-	var getResponseProduct Dto
+	var getResponseProduct product.Dto
 	err = json.Unmarshal([]byte(getSpy.written), &getResponseProduct)
 	if err != nil {
 		t.Fatalf("could not unmarshal response: %s\n", err.Error())
@@ -66,7 +67,7 @@ func TestHandler_ServeHTTP_Post_Then_Get(t *testing.T) {
 }
 
 func validateThatExpectedProductsAreRetrieved(t *testing.T, spy spyWriter) {
-	var products Products = make(Products)
+	var products product.Products = make(product.Products)
 	err := json.Unmarshal([]byte(spy.written), &products)
 	if err != nil {
 		t.Fatalf("could not unmarshal response: %s", err.Error())
@@ -81,7 +82,7 @@ func validateThatExpectedProductsAreRetrieved(t *testing.T, spy spyWriter) {
 }
 
 func validateThatSpecificExpectedProductIsRetrieved(t *testing.T, spy spyWriter) {
-	var p Dto
+	var p product.Dto
 	err := json.Unmarshal([]byte(spy.written), &p)
 	if err != nil {
 		t.Fatalf("could not unmarshal response: %s", err.Error())
@@ -96,7 +97,7 @@ func validateThatSpecificExpectedProductIsRetrieved(t *testing.T, spy spyWriter)
 }
 
 func setUpServeHTTPTest(target string) (http.Handler, *http.Request, spyWriter) {
-	var fakePersistence Persistence = stubPersistence{}
+	var fakePersistence product.Persistence = stubPersistence{}
 	testHandler := MakeHandler(fakePersistence, &fakeLoginPersistence{})
 	fakeRequest := httptest.NewRequest(http.MethodGet, target, http.NoBody)
 	spy := spyWriter{}
@@ -125,49 +126,49 @@ func (s *spyWriter) WriteHeader(h int) {
 type stubPersistence struct {
 }
 
-func (s stubPersistence) GetProducts() (Products, error) {
+func (s stubPersistence) GetProducts() (product.Products, error) {
 	return expectedProducts, nil
 }
 
-func (s stubPersistence) SaveProduct(p Product) error {
+func (s stubPersistence) SaveProduct(p product.Product) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s stubPersistence) DeleteProduct(id Id) error {
+func (s stubPersistence) DeleteProduct(id product.Id) error {
 	//TODO implement me
 	panic("implement me")
 }
 
 type fakePersistence struct {
-	savedProducts Products
+	savedProducts product.Products
 	ratings       ratings.Ratings
 }
 
-func (f *fakePersistence) ReadRating(id Id) ratings.Rating {
+func (f *fakePersistence) ReadRating(id product.Id) ratings.Rating {
 	return f.ratings[id]
 }
 
-func (f *fakePersistence) SaveRating(id Id, rating ratings.Rating) {
+func (f *fakePersistence) SaveRating(id product.Id, rating ratings.Rating) {
 	if f.ratings == nil {
 		f.ratings = make(ratings.Ratings)
 	}
 	f.ratings[id] = rating
 }
 
-func (f *fakePersistence) GetProducts() (Products, error) {
+func (f *fakePersistence) GetProducts() (product.Products, error) {
 	return f.savedProducts, nil
 }
 
-func (f *fakePersistence) SaveProduct(p Product) error {
+func (f *fakePersistence) SaveProduct(p product.Product) error {
 	if f.savedProducts == nil {
-		f.savedProducts = make(Products)
+		f.savedProducts = make(product.Products)
 	}
 	f.savedProducts[p.GetId()] = p.DTO()
 	return nil
 }
 
-func (f *fakePersistence) DeleteProduct(id Id) error {
+func (f *fakePersistence) DeleteProduct(id product.Id) error {
 	//TODO implement me
 	panic("implement me")
 }
@@ -205,15 +206,15 @@ func (f fakeLoginPersistence) DeleteUser(name login.UserName) error {
 	panic("implement me")
 }
 
-var expectedProducts = make(Products)
+var expectedProducts = make(product.Products)
 
 func init() {
-	expectedProducts[productId1] = Dto{
+	expectedProducts[productId1] = product.Dto{
 		Name:        "product1",
 		Price:       1,
 		Description: "",
 	}
-	expectedProducts["product2-id"] = Dto{
+	expectedProducts["product2-id"] = product.Dto{
 		Name:        "product2",
 		Price:       10,
 		Description: "",

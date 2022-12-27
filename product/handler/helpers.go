@@ -1,13 +1,14 @@
-package product
+package handler
 
 import (
 	"encoding/json"
 	"net/http"
+	"spacemoon/product"
 	"strings"
 )
 
 func (h *handler) getAllProducts() {
-	var products Products
+	var products product.Products
 	products, err := h.productPersistence.GetProducts()
 	if err != nil {
 		h.writer.WriteHeader(http.StatusInternalServerError)
@@ -22,7 +23,7 @@ func (h *handler) getAllProducts() {
 	}
 }
 
-func (h *handler) getSpecificProduct(productId Id) {
+func (h *handler) getSpecificProduct(productId product.Id) {
 	products, err := h.productPersistence.GetProducts()
 	if err != nil {
 		h.writer.WriteHeader(http.StatusInternalServerError)
@@ -41,7 +42,7 @@ func (h *handler) getSpecificProduct(productId Id) {
 	}
 }
 
-func (h *handler) respondWithCreatedProduct(createdProduct Product) {
+func (h *handler) respondWithCreatedProduct(createdProduct product.Product) {
 	h.writer.WriteHeader(http.StatusCreated)
 	err := json.NewEncoder(h.writer).Encode(createdProduct)
 	if err != nil {
@@ -50,24 +51,24 @@ func (h *handler) respondWithCreatedProduct(createdProduct Product) {
 	}
 }
 
-func (h *handler) getProductFromRequest() (Dto, error) {
-	var newProduct = Dto{}
+func (h *handler) getProductFromRequest() (product.Dto, error) {
+	var newProduct = product.Dto{}
 	err := json.NewDecoder(h.request.Body).Decode(&newProduct)
 	if err != nil {
-		return Dto{}, err
+		return product.Dto{}, err
 	}
 	return newProduct, nil
 }
 
-func (h *handler) getIdFromRequest() Id {
-	return Id(h.request.FormValue("id"))
+func (h *handler) getIdFromRequest() product.Id {
+	return product.Id(h.request.FormValue("id"))
 }
 
-func isNotEmpty(productId Id) bool {
+func isNotEmpty(productId product.Id) bool {
 
 	return strings.TrimSpace(string(productId)) != ""
 }
 
-func isEmpty(productId Id) bool {
+func isEmpty(productId product.Id) bool {
 	return strings.TrimSpace(string(productId)) == ""
 }

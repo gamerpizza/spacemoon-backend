@@ -2,6 +2,7 @@
 package post
 
 import (
+	"github.com/google/uuid"
 	"spacemoon/login"
 	"time"
 )
@@ -59,3 +60,9 @@ type Posts map[Id]Post
 
 // Likes uses a string as a login.UserName to work with Google Cloud without a driver
 type Likes map[string]bool
+
+// New creates a new post
+func New(caption Caption, author login.UserName, urls ContentURIS) Post {
+	var id = Id(uuid.NewString())
+	return Post{Caption: caption, Author: author, URLS: urls, Id: id, Created: time.Now()}
+}
