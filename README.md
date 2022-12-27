@@ -18,10 +18,13 @@ Right now, it is using PORT 1234 to receive the requests.
 
 ## [Unreleased]
 ### Added
-* delete posts
 * edit posts
 * user profile
 * 1 username per person
+
+##  [v1.0.3] - _2022 12 27_
+### Added
+* delete posts
 
 ##  [v1.0.2] - _2022 12 23_
 ### Fixed
