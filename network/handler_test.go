@@ -137,7 +137,16 @@ func TestHandler_ServeHTTP_PutFlipsLikedState(t *testing.T) {
 
 }
 
+func TestHandler_ServeHTTP_Delete(t *testing.T) {
+	
+}
+
 type failPersistence struct {
+}
+
+func (f failPersistence) DeletePost() {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (f failPersistence) AddPost(_ post.Post) error {
@@ -179,6 +188,11 @@ func (f failLoginPersistence) Check(name login.UserName) (bool, error) {
 type stubPersistence struct {
 }
 
+func (s stubPersistence) DeletePost() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (s stubPersistence) AddPost(_ post.Post) error {
 	return nil
 }
@@ -191,6 +205,11 @@ var expectedPosts = post.Posts{"1": post.Post{}, "2": post.Post{}}
 
 type mockPersistence struct {
 	posts post.Posts
+}
+
+func (m *mockPersistence) DeletePost() {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (m *mockPersistence) AddPost(p post.Post) error {

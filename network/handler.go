@@ -29,6 +29,8 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.post()
 	case http.MethodPut:
 		h.toggleLike()
+	case http.MethodDelete:
+		h.delete()
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
@@ -133,6 +135,10 @@ func (h handler) toggleLike() {
 	if err != nil {
 		return
 	}
+}
+
+func (h handler) delete() {
+	h.persistence.DeletePost()
 }
 
 func New(np Persistence, lp login.Persistence, mfp MediaFilePersistence) http.Handler {

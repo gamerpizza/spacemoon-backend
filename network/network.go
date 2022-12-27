@@ -33,6 +33,7 @@ type PostManager interface {
 type Persistence interface {
 	AddPost(post post.Post) error
 	GetAllPosts() (post.Posts, error)
+	DeletePost()
 }
 
 type postManager struct {
