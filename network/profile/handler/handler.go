@@ -9,17 +9,12 @@ import (
 	"strings"
 )
 
-type Persistence interface {
-	GetProfile(profile.Id) (profile.Profile, error)
-	SaveProfile(profile.Profile)
-}
-
-func New(p Persistence, lp login.Persistence) http.Handler {
-	return handler{persistence: p, loginPersistence: lp}
+func New(p profile.Persistence, lp login.Persistence) http.Handler {
+	return &handler{persistence: p, loginPersistence: lp}
 }
 
 type handler struct {
-	persistence      Persistence
+	persistence      profile.Persistence
 	loginPersistence login.Persistence
 }
 

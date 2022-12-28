@@ -141,7 +141,7 @@ func TestHandler_ServeHTTP_CannotDELETE(t *testing.T) {
 	}
 }
 
-func getFakePersistence() Persistence {
+func getFakePersistence() profile.Persistence {
 	return fakePersistence{profiles: map[profile.Id]profile.Profile{expectedUserId: profile.Profile{
 		Id:       expectedUserId,
 		UserName: expectedUserName,
@@ -154,11 +154,12 @@ type fakePersistence struct {
 	profiles map[profile.Id]profile.Profile
 }
 
-func (s fakePersistence) SaveProfile(p profile.Profile) {
+func (s fakePersistence) SaveProfile(p profile.Profile) error {
 	if s.profiles == nil {
 		s.profiles = make(map[profile.Id]profile.Profile)
 	}
 	s.profiles[p.Id] = p
+	return nil
 }
 
 func (s fakePersistence) GetProfile(id profile.Id) (profile.Profile, error) {

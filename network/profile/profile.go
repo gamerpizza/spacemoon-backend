@@ -34,3 +34,8 @@ type AvatarUrl string
 func (u AvatarUrl) String() string {
 	return string(u)
 }
+
+type Persistence interface {
+	GetProfile(Id) (Profile, error)
+	SaveProfile(Profile) error
+}
