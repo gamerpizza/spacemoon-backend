@@ -2,16 +2,16 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"spacemoon/login"
-	"spacemoon/network/handler"
-	"spacemoon/product/category"
-	handler2 "spacemoon/product/handler"
-	product_handler2 "spacemoon/product/ratings"
+	"spacemoon/network/profile"
+	"spacemoon/network/profile/handler"
 	"spacemoon/server/cors"
+	"spacemoon/server/persistence/firestore"
 	"strings"
 	"time"
 )
@@ -36,35 +36,34 @@ func setupHandlers() {
 	if err != nil {
 		panic(err)
 	}
-	socialNetworkHandler := handler.New(getSocialNetworkPersistence(), loginPersistence, mediaFilePersistence)
-	protectedSocialNetworkHandler := protector.Protect(&socialNetworkHandler)
-	protectedSocialNetworkHandler.Unprotect(http.MethodGet)
-	corsEnabledSocialNetworkHandler := cors.EnableCors(protectedSocialNetworkHandler,
-		http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete)
-	http.Handle("/posts", corsEnabledSocialNetworkHandler)
+	socialNetworkPersistence := getSocialNetworkPersistence()
+	setupSocialNetworkHandler(socialNetworkPersistence, loginPersistence, mediaFilePersistence, protector)
+	setupProductHandlers(loginPersistence, protector)
+	setupCategoryHandler(protector)
 
-	productHandler := handler2.MakeHandler(getProductPersistence(), loginPersistence)
-	preparedProductHandler := prepareHandler(protector, productHandler, http.MethodGet)
-	http.Handle("/product", preparedProductHandler)
-	productRatingHandler := product_handler2.MakeRankingsHandler(getProductRatingsPersistence())
-	preparedProductRatingHandler := prepareHandler(protector, productRatingHandler, http.MethodGet)
-	http.Handle("/product/rating", preparedProductRatingHandler)
-
-	categoryHandler := category.MakeHandler(getCategoryPersistence())
-	preparedCategoryHandler := prepareHandler(protector, categoryHandler, http.MethodGet)
-	http.Handle("/category", preparedCategoryHandler)
+	profilePersistence, err := getProfilePersistence(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	profileHandler := handler.New(profilePersistence, loginPersistence)
+	protectedProfileHandler := protector.Protect(&profileHandler)
+	protectedProfileHandler.Unprotect(http.MethodGet)
+	corsEnabledProtectedProfileHandler := cors.EnableCors(protectedProfileHandler, http.MethodGet, http.MethodPut)
+	http.Handle("/profile", corsEnabledProtectedProfileHandler)
 
 	log.Default().Print("handler registration done, ready for takeoff")
 }
 
-func prepareHandler(protector login.Protector, handler http.Handler, unprotectedMethods ...string) http.Handler {
-	protectedHandler := protector.Protect(&handler)
-	for _, method := range unprotectedMethods {
-		protectedHandler.Unprotect(method)
+func getProfilePersistence(ctx context.Context) (profile.Persistence, error) {
+	creds := os.Getenv(googleCredentials)
+	if strings.TrimSpace(creds) == "" {
+		return nil, errors.New("no google credentials file set")
 	}
-	corsEnabledProtectedProductHandler := cors.EnableCors(protectedHandler,
-		http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete)
-	return corsEnabledProtectedProductHandler
+	persistence, err := firestore.GetPersistence(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return persistence, nil
 }
 
 func listenAndServe() {
