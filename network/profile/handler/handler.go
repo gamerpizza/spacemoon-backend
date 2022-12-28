@@ -39,6 +39,19 @@ func (h handler) updateProfile(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&newProfile)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(err.Error()))
+		return
+	}
+	token := login.Token(strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer "))
+	user, err := h.loginPersistence.GetUser(token)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = w.Write([]byte(err.Error()))
+		return
+	}
+	if login.UserName(pr.Id) != user {
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = w.Write([]byte("you can only update your own profile"))
 		return
 	}
 	if strings.TrimSpace(newProfile.Motto.String()) != "" {
@@ -50,7 +63,12 @@ func (h handler) updateProfile(w http.ResponseWriter, r *http.Request) {
 	if strings.TrimSpace(newProfile.Avatar.Url.String()) != "" {
 		pr.Avatar.Url = newProfile.Avatar.Url
 	}
-	h.persistence.SaveProfile(pr)
+	err = h.persistence.SaveProfile(pr)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(err.Error()))
+		return
+	}
 	return
 }
 
