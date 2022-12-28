@@ -3,6 +3,7 @@ package firestore
 import (
 	"cloud.google.com/go/firestore"
 	"context"
+	"errors"
 	"fmt"
 	"spacemoon/login"
 	"spacemoon/network"
@@ -11,6 +12,7 @@ import (
 	"spacemoon/product"
 	"spacemoon/product/category"
 	"spacemoon/product/ratings"
+	"strings"
 )
 
 type Persistence interface {
@@ -41,6 +43,9 @@ func (p *fireStorePersistence) GetProfile(id profile.Id) (profile.Profile, error
 	collection := p.storage.Collection(profilesCollection)
 	doc, err := collection.Doc(string(id)).Get(p.ctx)
 	if err != nil {
+		if strings.Contains(err.Error(), "NotFound") {
+			return profile.Profile{}, NotFoundError
+		}
 		return profile.Profile{}, fmt.Errorf("could not read from firestore: %w", err)
 	}
 	pr := profile.Profile{}
@@ -133,3 +138,5 @@ const projectID = "global-pagoda-368419"
 const productCollection = "products"
 const postsCollection = "posts"
 const profilesCollection = "profiles"
+
+var NotFoundError = errors.New("not found")

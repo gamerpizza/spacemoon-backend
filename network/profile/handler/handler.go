@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"spacemoon/login"
 	"spacemoon/network/profile"
+	"spacemoon/server/persistence/firestore"
 	"strings"
 )
 
@@ -73,7 +74,7 @@ func (h handler) getProfile(w http.ResponseWriter, r *http.Request) (p profile.P
 		return profile.Profile{}, true
 	}
 	pr, err := h.persistence.GetProfile(id)
-	if err != nil && errors.Is(err, NotFoundError) {
+	if err != nil && errors.Is(err, firestore.NotFoundError) {
 		check, err := h.loginPersistence.Check(login.UserName(id))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -83,7 +84,10 @@ func (h handler) getProfile(w http.ResponseWriter, r *http.Request) (p profile.P
 			w.WriteHeader(http.StatusNotFound)
 			return profile.Profile{}, true
 		}
-		h.persistence.SaveProfile(profile.New(id, profile.UserName(id), "", ""))
+		err = h.persistence.SaveProfile(profile.New(id, profile.UserName(id), "", ""))
+		if err != nil {
+			return profile.Profile{}, false
+		}
 		newProfile, err := h.persistence.GetProfile(id)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -97,5 +101,3 @@ func (h handler) getProfile(w http.ResponseWriter, r *http.Request) (p profile.P
 	}
 	return pr, false
 }
-
-var NotFoundError = errors.New("not found")

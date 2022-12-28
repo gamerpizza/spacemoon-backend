@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"spacemoon/login"
 	"spacemoon/network/profile"
+	"spacemoon/server/persistence/firestore"
 	"testing"
 	"time"
 )
@@ -165,7 +166,7 @@ func (s fakePersistence) SaveProfile(p profile.Profile) error {
 func (s fakePersistence) GetProfile(id profile.Id) (profile.Profile, error) {
 	p, exists := s.profiles[id]
 	if !exists {
-		return profile.Profile{}, NotFoundError
+		return profile.Profile{}, firestore.NotFoundError
 	}
 	return p, nil
 }
