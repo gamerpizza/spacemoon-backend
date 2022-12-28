@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"spacemoon/login"
 	"spacemoon/network/profile"
 	"strings"
 )
@@ -13,12 +14,13 @@ type Persistence interface {
 	SaveProfile(profile.Profile)
 }
 
-func New(p Persistence) http.Handler {
-	return handler{persistence: p}
+func New(p Persistence, lp login.Persistence) http.Handler {
+	return handler{persistence: p, loginPersistence: lp}
 }
 
 type handler struct {
-	persistence Persistence
+	persistence      Persistence
+	loginPersistence login.Persistence
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -77,8 +79,22 @@ func (h handler) getProfile(w http.ResponseWriter, r *http.Request) (p profile.P
 	}
 	pr, err := h.persistence.GetProfile(id)
 	if err != nil && errors.Is(err, NotFoundError) {
-		w.WriteHeader(http.StatusNotFound)
-		return profile.Profile{}, true
+		check, err := h.loginPersistence.Check(login.UserName(id))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return profile.Profile{}, true
+		}
+		if !check {
+			w.WriteHeader(http.StatusNotFound)
+			return profile.Profile{}, true
+		}
+		h.persistence.SaveProfile(profile.New(id, profile.UserName(id), "", ""))
+		newProfile, err := h.persistence.GetProfile(id)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return profile.Profile{}, true
+		}
+		return newProfile, false
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = w.Write([]byte(err.Error()))
