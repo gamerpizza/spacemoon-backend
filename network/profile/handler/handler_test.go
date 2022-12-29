@@ -181,8 +181,7 @@ func (f *fakeLoginPersistence) SetUserToken(name login.UserName, token login.Tok
 }
 
 func (f *fakeLoginPersistence) GetUser(token login.Token) (login.UserName, error) {
-	//TODO implement me
-	panic("implement me")
+	return expectedUserId, nil
 }
 
 func (f *fakeLoginPersistence) SignUpUser(u login.UserName, p login.Password) error {

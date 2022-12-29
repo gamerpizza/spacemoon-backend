@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"spacemoon/login"
 	"spacemoon/network/profile"
@@ -37,7 +38,7 @@ func (h handler) updateProfile(w http.ResponseWriter, r *http.Request) {
 	}
 	var newProfile profile.Profile
 	err := json.NewDecoder(r.Body).Decode(&newProfile)
-	if err != nil {
+	if err != nil && !errors.Is(err, io.EOF) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte(err.Error()))
 		return
