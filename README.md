@@ -17,7 +17,8 @@ Right now, it is using PORT 1234 to receive the requests.
 # Changelog    
 
 ## [Unreleased]
-* user profile persistence
+### Added
+* Direct Messages
 
 ### Fixed
 * 1 username per person
@@ -28,6 +29,7 @@ Right now, it is using PORT 1234 to receive the requests.
   * GET profile
   * PUT profile
   * add profile if not exists (and user does exist)
+  * user profile persistence
 
 ##  [v1.0.4] - _2022 12 27_
 ### Fixed
