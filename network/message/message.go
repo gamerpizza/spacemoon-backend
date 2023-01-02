@@ -5,37 +5,47 @@ import (
 	"time"
 )
 
+type ConversationThread interface {
+}
+
+func New(author Author, recipient Recipient, content string, postingTime time.Time) Message {
+	return Message{
+		author: author, recipient: recipient, content: content, postingTime: postingTime,
+	}
+}
+
 type Message struct {
-	author    profile.Id
-	recipient profile.Id
+	author      Author
+	recipient   Recipient
+	content     string
+	postingTime time.Time
 }
 
 func (m *Message) String() string {
-	return ""
+	return m.content
 }
 
-func (m *Message) Time() time.Time {
-	return time.Time{}
+func (m *Message) PostingTime() time.Time {
+	return m.postingTime
 }
 
 func (m *Message) Author() Author {
-	return Author(m.author)
+	return m.author
 }
 
 func (m *Message) Recipient() Recipient {
-	return Recipient(m.recipient)
+	return m.recipient
 }
 
-func (m *Message) SetAuthor(from profile.Id) {
+func (m *Message) SetAuthor(from Author) {
 	m.author = from
 }
 
-func (m *Message) SetRecipient(to profile.Id) {
+func (m *Message) SetRecipient(to Recipient) {
 	m.recipient = to
 }
 
 type Author profile.Id
 type Recipient profile.Id
-
-type UserMessages map[Author][]Message
-type Messages map[Recipient]UserMessages
+type SentUserMessages map[Recipient][]Message
+type ReceivedUserMessages map[Author][]Message

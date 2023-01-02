@@ -14,19 +14,19 @@ type Sender interface {
 }
 
 type messageSender struct {
-	from        profile.Id
-	to          profile.Id
+	from        Author
+	to          Recipient
 	persistence Persistence
 	message     Message
 }
 
 func (s *messageSender) From(p profile.Id) Sender {
-	s.from = p
+	s.from = Author(p)
 	return s
 }
 
 func (s *messageSender) To(p profile.Id) Sender {
-	s.to = p
+	s.to = Recipient(p)
 	return s
 }
 

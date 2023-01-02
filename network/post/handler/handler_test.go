@@ -143,7 +143,7 @@ func TestHandler_ServeHTTP_Delete(t *testing.T) {
 		log.Fatal(err.Error())
 	}
 
-	h := New(networkPersistence, failLoginPersistence{}, stubMediaFilePersistence{})
+	h := New(networkPersistence, stubLoginPersistence{}, stubMediaFilePersistence{})
 	request := httptest.NewRequest(http.MethodDelete, string("/?id="+testPost.GetId()), http.NoBody)
 	recorder := httptest.NewRecorder()
 	h.ServeHTTP(recorder, request)
