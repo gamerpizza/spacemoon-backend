@@ -39,7 +39,7 @@ func TestNetwork(t *testing.T) {
 		t.Fatalf("invalid Caption (%s), expected: %s", p.GetCaption(), caption)
 	}
 	if p.GetAuthor() != user {
-		t.Fatalf("invalid Author (%s), expected: %s", p.GetAuthor(), user)
+		t.Fatalf("invalid GetAuthor (%s), expected: %s", p.GetAuthor(), user)
 	}
 	var c post.Content = p.Content()
 	var urls post.ContentURIS = c.GetURLS()
