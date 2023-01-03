@@ -140,7 +140,32 @@ func (h handler) toggleLike() {
 
 func (h handler) delete() {
 	id := post.Id(h.request.FormValue("id"))
-	h.persistence.DeletePost(id)
+	allPosts, err := h.persistence.GetAllPosts()
+	if err != nil {
+		h.writer.WriteHeader(http.StatusInternalServerError)
+		_, _ = h.writer.Write([]byte(err.Error()))
+		return
+	}
+
+	token := strings.TrimPrefix(h.request.Header.Get("Authorization"), "Bearer ")
+	user, err := h.loginPersistence.GetUser(login.Token(token))
+	if _, exists := allPosts[id]; !exists {
+		h.writer.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	if allPosts[id].Author != user {
+		h.writer.WriteHeader(http.StatusUnauthorized)
+		_, _ = h.writer.Write([]byte("user does not own that post"))
+		return
+	}
+
+	err = h.persistence.DeletePost(id)
+	if err != nil {
+		h.writer.WriteHeader(http.StatusInternalServerError)
+		_, _ = h.writer.Write([]byte(err.Error()))
+		return
+	}
 	h.writer.WriteHeader(http.StatusNoContent)
 }
 

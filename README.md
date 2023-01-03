@@ -17,10 +17,21 @@ Right now, it is using PORT 1234 to receive the requests.
 # Changelog    
 
 ## [Unreleased]
-### Added
-* edit posts
-* user profile
+* user profile persistence
+
+### Fixed
 * 1 username per person
+
+##  [v1.1.0] - _2022 12 28_
+### Added
+* user profile
+  * GET profile
+  * PUT profile
+  * add profile if not exists (and user does exist)
+
+##  [v1.0.4] - _2022 12 27_
+### Fixed
+* you can only erase your own posts
 
 ##  [v1.0.3] - _2022 12 27_
 ### Added
