@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"spacemoon/login"
+	"spacemoon/network/message"
 	"spacemoon/network/profile"
 	"spacemoon/network/profile/handler"
 	"spacemoon/server/cors"
@@ -17,8 +18,8 @@ import (
 )
 
 func main() {
-	log.Default().Print("starting spacemoon server 🚀")
-	log.Default().Print("v1.0.3")
+	log.Default().Print("starting spacemoon/bubblegum server 🚀")
+	log.Default().Print("v1.2.1")
 	setupHandlers()
 	listenAndServe()
 }
@@ -51,7 +52,19 @@ func setupHandlers() {
 	corsEnabledProtectedProfileHandler := cors.EnableCors(protectedProfileHandler, http.MethodGet, http.MethodPut)
 	http.Handle("/profile", corsEnabledProtectedProfileHandler)
 
+	messageHandler := message.NewHandler(getMessagePersistence(), loginPersistence)
+	http.Handle("/dm", messageHandler)
+
 	log.Default().Print("handler registration done, ready for takeoff")
+}
+
+func getMessagePersistence() message.Persistence {
+	storage, err := firestore.GetPersistence(context.Background())
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return storage
 }
 
 func getProfilePersistence(ctx context.Context) (profile.Persistence, error) {

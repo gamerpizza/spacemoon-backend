@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"spacemoon/login"
 	"spacemoon/network"
+	"spacemoon/network/message"
 	"spacemoon/network/post"
 	"spacemoon/network/profile"
 	"spacemoon/product"
@@ -22,6 +23,7 @@ type Persistence interface {
 	category.Persistence
 	network.Persistence
 	profile.Persistence
+	message.Persistence
 	Close() error
 }
 
@@ -138,5 +140,6 @@ const projectID = "global-pagoda-368419"
 const productCollection = "products"
 const postsCollection = "posts"
 const profilesCollection = "profiles"
+const messagesCollection = "direct-messages"
 
 var NotFoundError = errors.New("not found")
