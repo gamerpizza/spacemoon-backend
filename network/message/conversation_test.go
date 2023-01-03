@@ -10,10 +10,10 @@ func TestConversations(t *testing.T) {
 	var m Messenger = NewMessenger(persistence)
 	var messages []Message = m.GetConversationsBetween(u1).And(u2)
 	for _, message := range messages {
-		if author := message.Author(); author != Author(u1) && author != Author(u2) {
-			t.Fatalf("unexpected author for %+v: %s", m, author)
+		if author := message.GetAuthor(); author != Author(u1) && author != Author(u2) {
+			t.Fatalf("unexpected Author for %+v: %s", m, author)
 		}
-		if recipient := message.Recipient(); recipient != Recipient(u1) && recipient != Recipient(u2) {
+		if recipient := message.GetRecipient(); recipient != Recipient(u1) && recipient != Recipient(u2) {
 			t.Fatalf("unexpected recipientfor %+v: %s", m, recipient)
 		}
 	}

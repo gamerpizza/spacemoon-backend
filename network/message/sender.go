@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"spacemoon/network/profile"
 	"strings"
+	"time"
 )
 
 type Sender interface {
@@ -39,6 +40,7 @@ func (s *messageSender) Now() error {
 	}
 	s.message.SetAuthor(s.from)
 	s.message.SetRecipient(s.to)
+	s.message.PostingTime = time.Now()
 	err := s.persistence.Save(s.message)
 	if err != nil {
 		return fmt.Errorf("could not save message: %w", err)
@@ -46,5 +48,5 @@ func (s *messageSender) Now() error {
 	return nil
 }
 
-var RecipientNotSetError error = errors.New("message Recipient `To()` not set")
-var AuthorNotSetError error = errors.New("message Author `From()` not set")
+var RecipientNotSetError error = errors.New("message GetRecipient `To()` not set")
+var AuthorNotSetError error = errors.New("message GetAuthor `From()` not set")

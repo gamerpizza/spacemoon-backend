@@ -17,11 +17,12 @@ Right now, it is using PORT 1234 to receive the requests.
 # Changelog    
 
 ## [Unreleased]
-### Added
-* Direct Messages
-
 ### Fixed
 * 1 username per person
+
+##  [v1.2.0] - _2023 01 03_
+### Added
+* Direct Messages
 
 ##  [v1.1.0] - _2022 12 28_
 ### Added

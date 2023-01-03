@@ -8,7 +8,8 @@ type Persistence interface {
 	// Save saves a message and returns and error if one happens when trying to do so
 	Save(Message) error
 	// GetMessagesFor retrieves all the messages for a specific user profile.Id as a Recipient
-	GetMessagesFor(id Recipient) ReceivedUserMessages
+	GetMessagesFor(Recipient) ReceivedUserMessages
+	GetMessagesBy(Author) SentUserMessages
 }
 
 type ConversationReader interface {

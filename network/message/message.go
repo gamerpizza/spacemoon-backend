@@ -10,39 +10,39 @@ type ConversationThread interface {
 
 func New(author Author, recipient Recipient, content string, postingTime time.Time) Message {
 	return Message{
-		author: author, recipient: recipient, content: content, postingTime: postingTime,
+		Author: author, Recipient: recipient, Content: content, PostingTime: postingTime,
 	}
 }
 
 type Message struct {
-	author      Author
-	recipient   Recipient
-	content     string
-	postingTime time.Time
+	Author      Author    `json:"author"`
+	Recipient   Recipient `json:"recipient"`
+	Content     string    `json:"content"`
+	PostingTime time.Time `json:"posting_time"`
 }
 
 func (m *Message) String() string {
-	return m.content
+	return m.Content
 }
 
-func (m *Message) PostingTime() time.Time {
-	return m.postingTime
+func (m *Message) GetPostingTime() time.Time {
+	return m.PostingTime
 }
 
-func (m *Message) Author() Author {
-	return m.author
+func (m *Message) GetAuthor() Author {
+	return m.Author
 }
 
-func (m *Message) Recipient() Recipient {
-	return m.recipient
+func (m *Message) GetRecipient() Recipient {
+	return m.Recipient
 }
 
 func (m *Message) SetAuthor(from Author) {
-	m.author = from
+	m.Author = from
 }
 
 func (m *Message) SetRecipient(to Recipient) {
-	m.recipient = to
+	m.Recipient = to
 }
 
 type Author profile.Id

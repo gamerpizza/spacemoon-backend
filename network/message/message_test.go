@@ -20,9 +20,9 @@ func getFakePersistence() *fakePersistence {
 func TestMessage(t *testing.T) {
 	var m Message
 	var _ string = m.String()
-	var _ time.Time = m.PostingTime()
-	var _ Author = m.Author()
-	var _ Recipient = m.Recipient()
+	var _ time.Time = m.GetPostingTime()
+	var _ Author = m.GetAuthor()
+	var _ Recipient = m.GetRecipient()
 }
 
 func TestMessenger_SendMessage(t *testing.T) {
@@ -46,7 +46,7 @@ func TestSender_Now_ToShouldNotBeEmpty(t *testing.T) {
 	var msg Message
 	var err error = msgr.Send(msg).From(sender).Now()
 	if err == nil || !errors.Is(err, RecipientNotSetError) {
-		t.Fatal("Recipient should not be empty")
+		t.Fatal("GetRecipient should not be empty")
 	}
 }
 
@@ -57,13 +57,24 @@ func TestSender_Now_FromShouldNotBeEmpty(t *testing.T) {
 	var msg Message
 	var err error = msgr.Send(msg).To(receiver).Now()
 	if err == nil || !errors.Is(err, AuthorNotSetError) {
-		t.Fatal("Author should not be empty")
+		t.Fatal("GetAuthor should not be empty")
 	}
 }
 
 type fakePersistence struct {
 	messagesByRecipient map[Recipient]ReceivedUserMessages
 	ConversationReader
+}
+
+// No need for a double persistence, a nested map is rather easy to check for now
+func (f *fakePersistence) GetMessagesBy(a Author) SentUserMessages {
+	sentMessages := make(SentUserMessages)
+	for recipient, messages := range f.messagesByRecipient {
+		if conversation, exists := messages[a]; exists {
+			sentMessages[recipient] = conversation
+		}
+	}
+	return sentMessages
 }
 
 func (f *fakePersistence) GetMessagesFor(id Recipient) ReceivedUserMessages {
@@ -74,11 +85,9 @@ func (f *fakePersistence) Save(m Message) error {
 	if f.messagesByRecipient == nil {
 		f.messagesByRecipient = make(map[Recipient]ReceivedUserMessages)
 	}
-	if f.messagesByRecipient[m.recipient] == nil {
-		f.messagesByRecipient[m.recipient] = make(ReceivedUserMessages)
+	if f.messagesByRecipient[m.Recipient] == nil {
+		f.messagesByRecipient[m.Recipient] = make(ReceivedUserMessages)
 	}
-	f.messagesByRecipient[m.recipient][m.author] = append(f.messagesByRecipient[m.recipient][m.author], m)
+	f.messagesByRecipient[m.Recipient][m.Author] = append(f.messagesByRecipient[m.Recipient][m.Author], m)
 	return nil
 }
-
-//try double persistence (one by author, one by recipient)??

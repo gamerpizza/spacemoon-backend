@@ -19,3 +19,6 @@ func (c conversationGetter) And(secondProfileId profile.Id) []Message {
 	messages = append(messages, c.persistence.GetMessagesFor(Recipient(secondProfileId))[Author(c.firstProfileId)]...)
 	return messages
 }
+
+type UserConversations map[profile.Id]Conversation
+type Conversation []Message
