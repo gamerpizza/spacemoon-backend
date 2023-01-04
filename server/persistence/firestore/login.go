@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"spacemoon/login"
+	"strings"
 	"time"
 )
 
@@ -26,6 +27,7 @@ func (p *fireStorePersistence) SetUserToken(user login.UserName, token login.Tok
 
 func (p *fireStorePersistence) GetUser(token login.Token) (login.UserName, error) {
 	collection := p.storage.Collection(loginTokensCollection)
+	token = login.Token(strings.TrimPrefix(string(token), "Bearer "))
 	get, err := collection.Doc(string(token)).Get(p.ctx)
 	if err != nil {
 		return "", fmt.Errorf("could not get token from persistence: %w", err)
