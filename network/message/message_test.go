@@ -8,7 +8,7 @@ import (
 )
 
 func TestMessenger(t *testing.T) {
-	var m Messenger = NewMessenger(getFakePersistence())
+	var m Messenger = NewMessenger(getFakePersistence(), stubLoginPersistence{})
 	var p profile.Id
 	var _ ReceivedUserMessages = m.GetAllMessagesFor(Recipient(p))
 }
@@ -27,7 +27,7 @@ func TestMessage(t *testing.T) {
 
 func TestMessenger_SendMessage(t *testing.T) {
 	var messagePersistence Persistence = &fakePersistence{}
-	var msgr Messenger = NewMessenger(messagePersistence)
+	var msgr Messenger = NewMessenger(messagePersistence, stubLoginPersistence{})
 	var msg Message
 	var sndr profile.Id = "sender"
 	var rcvr profile.Id = "receiver"
@@ -41,7 +41,7 @@ func TestMessenger_SendMessage(t *testing.T) {
 
 func TestSender_Now_ToShouldNotBeEmpty(t *testing.T) {
 	var messagePersistence Persistence = &fakePersistence{}
-	var msgr Messenger = NewMessenger(messagePersistence)
+	var msgr Messenger = NewMessenger(messagePersistence, stubLoginPersistence{})
 	var sender profile.Id = "messageSender"
 	var msg Message
 	var err error = msgr.Send(msg).From(sender).Now()
@@ -52,12 +52,24 @@ func TestSender_Now_ToShouldNotBeEmpty(t *testing.T) {
 
 func TestSender_Now_FromShouldNotBeEmpty(t *testing.T) {
 	var messagePersistence Persistence = &fakePersistence{}
-	var msgr Messenger = NewMessenger(messagePersistence)
+	var msgr Messenger = NewMessenger(messagePersistence, stubLoginPersistence{})
 	var receiver profile.Id = "messageSender"
 	var msg Message
 	var err error = msgr.Send(msg).To(receiver).Now()
 	if err == nil || !errors.Is(err, AuthorNotSetError) {
 		t.Fatal("GetAuthor should not be empty")
+	}
+}
+
+func TestMessenger_SendMessage_ShouldFailOnBadUsername(t *testing.T) {
+	var messagePersistence Persistence = &fakePersistence{}
+	var msgr Messenger = NewMessenger(messagePersistence, stubLoginPersistence{})
+	var msg Message
+	var sndr profile.Id = "sender"
+	var rcvr profile.Id = stubLoginBadReceiver
+	var err error = msgr.Send(msg).From(sndr).To(rcvr).Now()
+	if err == nil {
+		t.Fatal("did not throw an error on invalid receiver")
 	}
 }
 
