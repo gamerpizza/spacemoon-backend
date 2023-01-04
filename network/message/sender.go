@@ -3,6 +3,7 @@ package message
 import (
 	"errors"
 	"fmt"
+	"spacemoon/login"
 	"spacemoon/network/profile"
 	"strings"
 	"time"
@@ -15,10 +16,11 @@ type Sender interface {
 }
 
 type messageSender struct {
-	from        Author
-	to          Recipient
-	persistence Persistence
-	message     Message
+	from             Author
+	to               Recipient
+	persistence      Persistence
+	loginPersistence login.Persistence
+	message          Message
 }
 
 func (s *messageSender) From(p profile.Id) Sender {
@@ -41,7 +43,14 @@ func (s *messageSender) Now() error {
 	s.message.SetAuthor(s.from)
 	s.message.SetRecipient(s.to)
 	s.message.PostingTime = time.Now()
-	err := s.persistence.Save(s.message)
+	check, err := s.loginPersistence.Check(login.UserName(s.to))
+	if err != nil {
+		return fmt.Errorf("could not check for recipient: %w", err)
+	}
+	if !check {
+		return RecipientNotFoundError
+	}
+	err = s.persistence.Save(s.message)
 	if err != nil {
 		return fmt.Errorf("could not save message: %w", err)
 	}
@@ -49,4 +58,5 @@ func (s *messageSender) Now() error {
 }
 
 var RecipientNotSetError error = errors.New("message GetRecipient `To()` not set")
+var RecipientNotFoundError error = errors.New("invalid recipient, user not found")
 var AuthorNotSetError error = errors.New("message GetAuthor `From()` not set")

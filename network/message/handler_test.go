@@ -179,10 +179,15 @@ func (s stubLoginPersistence) DeleteUser(_ login.UserName) error {
 	panic("implement me")
 }
 
-func (s stubLoginPersistence) Check(_ login.UserName) (bool, error) {
-	//TODO implement me
-	panic("implement me")
+func (s stubLoginPersistence) Check(u login.UserName) (bool, error) {
+
+	if u == stubLoginBadReceiver {
+		return false, nil
+	}
+	return true, nil
 }
+
+const stubLoginBadReceiver = "bad-receiver"
 
 type stubMessagePersistence struct {
 }

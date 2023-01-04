@@ -1,9 +1,12 @@
 package message
 
-import "spacemoon/network/profile"
+import (
+	"spacemoon/login"
+	"spacemoon/network/profile"
+)
 
-func NewMessenger(p Persistence) Messenger {
-	return messenger{persistence: p}
+func NewMessenger(p Persistence, lp login.Persistence) Messenger {
+	return messenger{persistence: p, loginPersistence: lp}
 }
 
 type Messenger interface {
@@ -16,7 +19,8 @@ type Messenger interface {
 }
 
 type messenger struct {
-	persistence Persistence
+	persistence      Persistence
+	loginPersistence login.Persistence
 }
 
 func (m messenger) ListConversationsFor(id profile.Id) []profile.Id {
@@ -48,5 +52,5 @@ func (m messenger) GetAllMessagesFor(p Recipient) ReceivedUserMessages {
 }
 
 func (m messenger) Send(msg Message) Sender {
-	return &messageSender{persistence: m.persistence, message: msg}
+	return &messageSender{loginPersistence: m.loginPersistence, persistence: m.persistence, message: msg}
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func TestConversations(t *testing.T) {
-	var m Messenger = NewMessenger(persistence)
+	var m Messenger = NewMessenger(persistence, stubLoginPersistence{})
 	var messages []Message = m.GetConversationsBetween(u1).And(u2)
 	for _, message := range messages {
 		if author := message.GetAuthor(); author != Author(u1) && author != Author(u2) {
