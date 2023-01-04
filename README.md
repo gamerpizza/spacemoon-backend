@@ -20,9 +20,13 @@ Right now, it is using PORT 1234 to receive the requests.
 ### Fixed
 * 1 username per person
 
+##  [v1.2.2] - _2023 01 04_
+### Fixed
+* clean "Bearer" from Bearer token if needed
+
 ##  [v1.2.1] - _2023 01 03_
 ### Fixed
-* Small fixes on profile handler
+* small fixes on profile handler
 
 ##  [v1.2.0] - _2023 01 03_
 ### Added
