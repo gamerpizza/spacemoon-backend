@@ -6,6 +6,10 @@
 
 ---
 
+##  [v1.2.4] - _2023 01 04_
+### Fixed
+* enable CORS on POST for direct message handler
+
 ##  [v1.2.3] - _2023 01 04_
 ### Fixed
 * send DMs only to existing users (check first)
