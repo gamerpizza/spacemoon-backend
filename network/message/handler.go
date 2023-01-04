@@ -10,7 +10,7 @@ import (
 )
 
 func NewHandler(mp Persistence, lp login.Persistence) http.Handler {
-	m := NewMessenger(mp)
+	m := NewMessenger(mp, lp)
 	var newHandler http.Handler = handler{loginPersistence: lp, messenger: m}
 	return cors.EnableCors(login.NewProtector(lp).Protect(&newHandler), http.MethodGet)
 }
