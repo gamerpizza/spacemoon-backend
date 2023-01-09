@@ -9,6 +9,7 @@ import (
 	"spacemoon/network"
 	"spacemoon/network/message"
 	"spacemoon/network/post"
+	"spacemoon/network/post/comment"
 	"spacemoon/network/profile"
 	"spacemoon/product"
 	"spacemoon/product/category"
@@ -24,6 +25,7 @@ type Persistence interface {
 	network.Persistence
 	profile.Persistence
 	message.Persistence
+	comment.Persistence
 	Close() error
 }
 
@@ -141,5 +143,7 @@ const productCollection = "products"
 const postsCollection = "posts"
 const profilesCollection = "profiles"
 const messagesCollection = "direct-messages"
+const commentsCollection = "post-comments"
+const commentsSubCollection = "comments"
 
 var NotFoundError = errors.New("not found")

@@ -57,7 +57,6 @@ func TestNetwork(t *testing.T) {
 	}
 
 	var _ post.Id = p.GetId()
-	var _ post.Comments = p.Comments()
 }
 
 func TestNetwork_GetPosts(t *testing.T) {

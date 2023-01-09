@@ -1,8 +1,17 @@
 # Changelog
 
 ## [Unreleased]
+### Added
+* polls
+* retweets
 ### Fixed
 * 1 username per person
+
+---
+
+##  [v1.3.0] - _2023 01 09_
+### Added
+* comments
 
 ---
 
