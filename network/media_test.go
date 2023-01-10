@@ -115,7 +115,7 @@ func (f *fakePersistence) DeletePost(post.Id) error {
 	return nil
 }
 
-func (f *fakePersistence) AddPost(post post.Post) error {
+func (f *fakePersistence) AddPost(p post.Post) error {
 	if f.posts == nil {
 		f.posts = map[post.Id]post.Post{}
 	}

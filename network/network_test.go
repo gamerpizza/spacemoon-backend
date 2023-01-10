@@ -14,7 +14,7 @@ func (m *mockPersistence) CheckIfPostExists(id post.Id) (bool, error) {
 	panic("implement me")
 }
 
-func (m *mockPersistence) AddPost(post post.Post) error {
+func (m *mockPersistence) AddPost(p post.Post) error {
 	if m.posts == nil {
 		m.posts = make(map[post.Id]post.Post)
 	}
