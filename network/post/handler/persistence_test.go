@@ -11,6 +11,11 @@ import (
 type failNetworkPersistence struct {
 }
 
+func (f failNetworkPersistence) CheckIfPostExists(id post.Id) (bool, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (f failNetworkPersistence) DeletePost(post.Id) error {
 	//TODO implement me
 	panic("implement me")
@@ -56,6 +61,11 @@ func (f failLoginPersistence) Check(name login.UserName) (bool, error) {
 type stubPersistence struct {
 }
 
+func (s stubPersistence) CheckIfPostExists(id post.Id) (bool, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (s stubPersistence) DeletePost(post.Id) error {
 
 	return nil
@@ -71,6 +81,11 @@ func (s stubPersistence) GetAllPosts() (post.Posts, error) {
 
 type mockNetworkPersistence struct {
 	posts post.Posts
+}
+
+func (m *mockNetworkPersistence) CheckIfPostExists(id post.Id) (bool, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (m *mockNetworkPersistence) DeletePost(p post.Id) error {

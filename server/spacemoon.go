@@ -9,6 +9,7 @@ import (
 	"os"
 	"spacemoon/login"
 	"spacemoon/network/message"
+	"spacemoon/network/post/comment"
 	"spacemoon/network/profile"
 	"spacemoon/network/profile/handler"
 	"spacemoon/server/cors"
@@ -54,6 +55,13 @@ func setupHandlers() {
 
 	messageHandler := message.NewHandler(getMessagePersistence(), loginPersistence)
 	http.Handle("/dm", messageHandler)
+
+	commentPersistence, err := firestore.GetPersistence(context.Background())
+	if err != nil {
+		panic(err.Error())
+	}
+	commentHandler := comment.NewHandler(loginPersistence, commentPersistence)
+	http.Handle("/comments", commentHandler)
 
 	log.Default().Print("handler registration done, ready for takeoff")
 }

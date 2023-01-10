@@ -9,6 +9,11 @@ type mockPersistence struct {
 	posts map[post.Id]post.Post
 }
 
+func (m *mockPersistence) CheckIfPostExists(id post.Id) (bool, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m *mockPersistence) AddPost(p post.Post) error {
 	if m.posts == nil {
 		m.posts = make(map[post.Id]post.Post)
@@ -57,7 +62,6 @@ func TestNetwork(t *testing.T) {
 	}
 
 	var _ post.Id = p.GetId()
-	var _ post.Comments = p.Comments()
 }
 
 func TestNetwork_GetPosts(t *testing.T) {

@@ -24,10 +24,6 @@ func (p *Post) GetId() Id {
 	return p.Id
 }
 
-func (p *Post) Comments() Comments {
-	return Comments{}
-}
-
 func (p *Post) Content() Content {
 	return Content{URLS: p.URLS}
 }
