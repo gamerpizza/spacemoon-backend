@@ -9,11 +9,11 @@ import (
 
 func TestComment(t *testing.T) {
 	var c Comment = New(author, text)
-	var a profile.Id = c.Author
+	var a profile.Id = profile.Id(c.Post.Author)
 	if a != author {
 		t.Fatal("invalid author")
 	}
-	var m string = c.Message
+	var m string = string(c.Post.Caption)
 	if m != text {
 		t.Fatal("invalid text on comment message")
 	}
@@ -37,7 +37,7 @@ func TestCommentManager_Post(t *testing.T) {
 func validatePostedCommentIsFound(t *testing.T, comments []Comment) {
 	found := false
 	for _, c := range comments {
-		if c.Author == author && c.Message == text {
+		if c.Post.Author == author && c.Post.Caption == text {
 			found = true
 		}
 	}

@@ -9,7 +9,12 @@ type mockPersistence struct {
 	posts map[post.Id]post.Post
 }
 
-func (m *mockPersistence) AddPost(p post.Post) error {
+func (m *mockPersistence) CheckIfPostExists(id post.Id) (bool, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *mockPersistence) AddPost(post post.Post) error {
 	if m.posts == nil {
 		m.posts = make(map[post.Id]post.Post)
 	}

@@ -2,8 +2,8 @@
 package comment
 
 import (
+	"spacemoon/login"
 	"spacemoon/network/post"
-	"spacemoon/network/profile"
 )
 
 // NewManager creates a new Manager. It is used like this to protect the implementation and only make public
@@ -22,13 +22,12 @@ type Manager interface {
 
 // New instantiates a new comment
 func New(author, text string) Comment {
-	return Comment{Author: profile.Id(author), Message: text}
+	return Comment{Post: post.New(post.Caption(text), login.UserName(author), nil)}
 }
 
 // Comment is a Message from a profile.Id Author that will be attached by a Manager to a post.Post
 type Comment struct {
-	Author  profile.Id
-	Message string
+	Post post.Post `json:"post"`
 }
 
 // Commenter is a helper interface to use of the `Post(Comment).On(post.Id)` format
@@ -38,7 +37,9 @@ type Commenter interface {
 
 // Persistence defines how the persistence for Comments should be implemented
 type Persistence interface {
+	// GetCommentsFor returns an array of Comment for the selected post.Post indicated by the post.Id
 	GetCommentsFor(id post.Id) ([]Comment, error)
+	// SaveComment saves a Comment to a selected post.Post indicated by the post.Id
 	SaveComment(post.Id, Comment) error
 }
 

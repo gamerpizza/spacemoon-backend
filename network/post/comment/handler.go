@@ -1,15 +1,18 @@
+// Package comment manages comments for posts in the social network
 package comment
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"spacemoon/login"
 	"spacemoon/network/post"
-	"spacemoon/network/profile"
 	"spacemoon/server/cors"
 	"strings"
 )
 
+// NewHandler returns a http.Handler, with CORS and login protection incorporated to handle comments
 func NewHandler(lp login.Persistence, p Persistence) http.Handler {
 	var h http.Handler = handler{loginPersistence: lp, manager: NewManager(p)}
 	protected := login.NewProtector(lp).Protect(&h)
@@ -50,14 +53,15 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h handler) createComment(w http.ResponseWriter, r *http.Request, comment *Comment) bool {
-	err := json.NewDecoder(r.Body).Decode(&comment)
+	all, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_, _ = w.Write([]byte("could not parse comment into json: " + err.Error()))
+		_, _ = w.Write([]byte(err.Error()))
 		return true
 	}
 	username, err := h.loginPersistence.GetUser(login.Token(strings.TrimPrefix("Bearer ", r.Header.Get("Authorization"))))
-	comment.Author = profile.Id(username)
+	*comment = New(string(username), fmt.Sprintf("%s", all))
+
 	return false
 }
 

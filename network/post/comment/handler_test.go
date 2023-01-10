@@ -16,39 +16,50 @@ import (
 func TestHandler_ServeHTTP(t *testing.T) {
 	var h http.Handler = NewHandler(stubLoginPersistence{}, &fakePersistence{})
 	const postId = "test-post"
-	var c = Comment{
-		Message: text,
-	}
-	b, err := json.Marshal(c)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/?%s=%s", postKey, postId), bytes.NewReader(b))
+	req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/?%s=%s", postKey, postId), bytes.NewReader([]byte(text)))
 	req.Header.Add("Authorization", "Bearer test")
 	spy := httptest.NewRecorder()
 	h.ServeHTTP(spy, req)
 	validateResponseCodeIsOk(t, spy.Code)
 
-	getReq := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/?%s=%s", postKey, postId), bytes.NewReader(b))
+	getReq := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/?%s=%s", postKey, postId), http.NoBody)
 	getSpy := httptest.NewRecorder()
 	h.ServeHTTP(getSpy, getReq)
 	validateResponseCodeIsOk(t, getSpy.Code)
 
 	responseBody := getSpy.Body.Bytes()
 	var retrievedComments []Comment
-	err = json.Unmarshal(responseBody, &retrievedComments)
+	err := json.Unmarshal(responseBody, &retrievedComments)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
 
 	found := false
 	for _, comment := range retrievedComments {
-		if comment.Author == author && comment.Message == text {
+		if comment.Post.Author == author && comment.Post.Caption == text {
 			found = true
 		}
 	}
 	if !found {
 		t.Fatal("comment not found")
+	}
+}
+
+func TestHandler_ServeHTTP_ShouldOnlyAllowToPostACommentOnAnExistingPost(t *testing.T) {
+	var h http.Handler = NewHandler(stubLoginPersistence{}, &fakePersistence{})
+	postReq := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/?%s=%s", postKey, nonExistingPostId), bytes.NewReader([]byte(text)))
+	postReq.Header.Add("Authorization", "Bearer test")
+	postSpy := httptest.NewRecorder()
+	h.ServeHTTP(postSpy, postReq)
+	if postSpy.Code != http.StatusNotFound {
+		t.Error("non existing post should not allow to add comments")
+	}
+
+	getReq := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/?%s=%s", postKey, nonExistingPostId), http.NoBody)
+	getSpy := httptest.NewRecorder()
+	h.ServeHTTP(getSpy, getReq)
+	if getSpy.Code != http.StatusNotFound {
+		t.Error("non existing post should should return a status not found when retrieving comments")
 	}
 }
 
@@ -64,14 +75,7 @@ func TestHandler_ServeHTTP_IsCORSEnabled(t *testing.T) {
 func TestHandler_ServeHTTP_POST_ShouldFailWithoutABearerToken(t *testing.T) {
 	var h http.Handler = NewHandler(stubLoginPersistence{}, &fakePersistence{})
 	const postId = "test-post"
-	var c = Comment{
-		Message: text,
-	}
-	b, err := json.Marshal(c)
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-	req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/?%s=%s", postKey, postId), bytes.NewReader(b))
+	req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/?%s=%s", postKey, postId), bytes.NewReader([]byte(text)))
 	spy := httptest.NewRecorder()
 	h.ServeHTTP(spy, req)
 	if spy.Code != http.StatusUnauthorized {
@@ -145,3 +149,5 @@ func (f stubLoginPersistence) Check(name login.UserName) (bool, error) {
 	//TODO implement me
 	panic("implement me")
 }
+
+const nonExistingPostId = "non-existing"
