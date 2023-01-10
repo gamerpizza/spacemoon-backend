@@ -14,7 +14,7 @@ import (
 )
 
 func TestHandler_ServeHTTP(t *testing.T) {
-	var h http.Handler = NewHandler(stubLoginPersistence{}, &fakePersistence{})
+	var h http.Handler = NewHandler(stubLoginPersistence{}, stubPostPersistence{}, &fakePersistence{})
 	const postId = "test-post"
 	req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/?%s=%s", postKey, postId), bytes.NewReader([]byte(text)))
 	req.Header.Add("Authorization", "Bearer test")
@@ -46,7 +46,7 @@ func TestHandler_ServeHTTP(t *testing.T) {
 }
 
 func TestHandler_ServeHTTP_ShouldOnlyAllowToPostACommentOnAnExistingPost(t *testing.T) {
-	var h http.Handler = NewHandler(stubLoginPersistence{}, &fakePersistence{})
+	var h http.Handler = NewHandler(stubLoginPersistence{}, stubPostCheckFailPersistence{}, &fakePersistence{})
 	postReq := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/?%s=%s", postKey, nonExistingPostId), bytes.NewReader([]byte(text)))
 	postReq.Header.Add("Authorization", "Bearer test")
 	postSpy := httptest.NewRecorder()
@@ -59,12 +59,12 @@ func TestHandler_ServeHTTP_ShouldOnlyAllowToPostACommentOnAnExistingPost(t *test
 	getSpy := httptest.NewRecorder()
 	h.ServeHTTP(getSpy, getReq)
 	if getSpy.Code != http.StatusNotFound {
-		t.Error("non existing post should should return a status not found when retrieving comments")
+		t.Errorf("non existing post should should return a status not found when retrieving comments: %d", getSpy.Code)
 	}
 }
 
 func TestHandler_ServeHTTP_IsCORSEnabled(t *testing.T) {
-	var h http.Handler = NewHandler(stubLoginPersistence{}, &fakePersistence{})
+	var h http.Handler = NewHandler(stubLoginPersistence{}, stubPostPersistence{}, &fakePersistence{})
 	req := httptest.NewRequest(http.MethodOptions, "/", http.NoBody)
 	spy := httptest.NewRecorder()
 	h.ServeHTTP(spy, req)
@@ -73,7 +73,7 @@ func TestHandler_ServeHTTP_IsCORSEnabled(t *testing.T) {
 }
 
 func TestHandler_ServeHTTP_POST_ShouldFailWithoutABearerToken(t *testing.T) {
-	var h http.Handler = NewHandler(stubLoginPersistence{}, &fakePersistence{})
+	var h http.Handler = NewHandler(stubLoginPersistence{}, stubPostPersistence{}, &fakePersistence{})
 	const postId = "test-post"
 	req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/?%s=%s", postKey, postId), bytes.NewReader([]byte(text)))
 	spy := httptest.NewRecorder()
@@ -148,6 +148,50 @@ func (f stubLoginPersistence) DeleteUser(name login.UserName) error {
 func (f stubLoginPersistence) Check(name login.UserName) (bool, error) {
 	//TODO implement me
 	panic("implement me")
+}
+
+type stubPostPersistence struct {
+}
+
+func (s stubPostPersistence) AddPost(post post.Post) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s stubPostPersistence) GetAllPosts() (post.Posts, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s stubPostPersistence) DeletePost(id post.Id) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s stubPostPersistence) CheckIfPostExists(id post.Id) (bool, error) {
+	return true, nil
+}
+
+type stubPostCheckFailPersistence struct {
+}
+
+func (s stubPostCheckFailPersistence) AddPost(post post.Post) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s stubPostCheckFailPersistence) GetAllPosts() (post.Posts, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s stubPostCheckFailPersistence) DeletePost(id post.Id) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s stubPostCheckFailPersistence) CheckIfPostExists(id post.Id) (bool, error) {
+	return false, nil
 }
 
 const nonExistingPostId = "non-existing"
