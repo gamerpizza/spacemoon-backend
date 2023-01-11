@@ -9,6 +9,10 @@
 
 ---
 
+##  [v1.3.1] - _2023 01 11_
+### Fixed
+* social network persistence added to comment handler on main
+
 ##  [v1.3.0] - _2023 01 11_
 ### Added
 * comments

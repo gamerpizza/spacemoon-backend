@@ -20,7 +20,7 @@ import (
 
 func main() {
 	log.Default().Print("starting spacemoon/bubblegum server 🚀")
-	log.Default().Print("v1.3.0")
+	log.Default().Print("v1.3.1")
 	setupHandlers()
 	listenAndServe()
 }
@@ -60,7 +60,7 @@ func setupHandlers() {
 	if err != nil {
 		panic(err.Error())
 	}
-	commentHandler := comment.NewHandler(loginPersistence, commentPersistence)
+	commentHandler := comment.NewHandler(loginPersistence, socialNetworkPersistence, commentPersistence)
 	http.Handle("/comments", commentHandler)
 
 	log.Default().Print("handler registration done, ready for takeoff")
