@@ -60,7 +60,7 @@ func setupHandlers() {
 	if err != nil {
 		panic(err.Error())
 	}
-	commentHandler := comment.NewHandler(loginPersistence, commentPersistence)
+	commentHandler := comment.NewHandler(loginPersistence, socialNetworkPersistence, commentPersistence)
 	http.Handle("/comments", commentHandler)
 
 	log.Default().Print("handler registration done, ready for takeoff")
