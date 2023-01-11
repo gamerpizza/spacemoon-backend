@@ -97,7 +97,7 @@ func (h handler) createComment(w http.ResponseWriter, r *http.Request, comment *
 		_, _ = w.Write([]byte(err.Error()))
 		return true
 	}
-	token := login.Token(strings.TrimPrefix("Bearer ", r.Header["Authorization"][1]))
+	token := login.Token(r.Header["Authorization"][0])
 	username, err := h.loginPersistence.GetUser(token)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
