@@ -62,4 +62,18 @@ func (p *fireStorePersistence) CheckIfPostExists(id post.Id) (bool, error) {
 	return true, nil
 }
 
+func (p *fireStorePersistence) GetPost(id post.Id) (post.Post, error) {
+	collection := p.storage.Collection(postsCollection)
+	doc, err := collection.Doc(string(id)).Get(p.ctx)
+	if err != nil {
+		return post.Post{}, fmt.Errorf("could not get saved post: %w", err)
+	}
+	var pst post.Post
+	err = doc.DataTo(&pst)
+	if err != nil {
+		return post.Post{}, fmt.Errorf("could not parse saved post: %w", err)
+	}
+	return pst, nil
+}
+
 var EmptyIdOnPostError = errors.New("post cannot have an empty id")

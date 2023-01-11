@@ -153,6 +153,11 @@ func (f stubLoginPersistence) Check(name login.UserName) (bool, error) {
 type stubPostPersistence struct {
 }
 
+func (s stubPostPersistence) GetPost(id post.Id) (post.Post, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (s stubPostPersistence) AddPost(post post.Post) error {
 	//TODO implement me
 	panic("implement me")
@@ -173,6 +178,11 @@ func (s stubPostPersistence) CheckIfPostExists(id post.Id) (bool, error) {
 }
 
 type stubPostCheckFailPersistence struct {
+}
+
+func (s stubPostCheckFailPersistence) GetPost(id post.Id) (post.Post, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (s stubPostCheckFailPersistence) AddPost(post post.Post) error {

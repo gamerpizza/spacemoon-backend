@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"spacemoon/login"
 	"spacemoon/network"
-	networkHandler "spacemoon/network/post/handler"
 	"spacemoon/product/category"
 	"spacemoon/product/handler"
 	"spacemoon/product/ratings"
@@ -12,7 +11,7 @@ import (
 )
 
 func setupSocialNetworkHandler(snp network.Persistence, loginPersistence login.Persistence, mediaFilePersistence network.MediaFilePersistence, protector login.Protector) {
-	socialNetworkHandler := networkHandler.New(snp, loginPersistence, mediaFilePersistence)
+	socialNetworkHandler := network.NewHandler(snp, loginPersistence, mediaFilePersistence)
 	protectedSocialNetworkHandler := protector.Protect(&socialNetworkHandler)
 	protectedSocialNetworkHandler.Unprotect(http.MethodGet)
 	corsEnabledSocialNetworkHandler := cors.EnableCors(protectedSocialNetworkHandler,
