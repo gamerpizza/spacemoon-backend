@@ -104,6 +104,11 @@ type fakePersistence struct {
 	posts post.Posts
 }
 
+func (f *fakePersistence) CheckIfPostExists(id post.Id) (bool, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (f *fakePersistence) DeletePost(post.Id) error {
 	//TODO implement me
 	panic("implement me")
