@@ -98,6 +98,11 @@ func (h handler) createComment(w http.ResponseWriter, r *http.Request, comment *
 		return true
 	}
 	username, err := h.loginPersistence.GetUser(login.Token(strings.TrimPrefix("Bearer ", r.Header.Get("Authorization"))))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(err.Error()))
+		return true
+	}
 	*comment = New(string(username), fmt.Sprintf("%s", all))
 
 	return false
