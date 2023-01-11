@@ -30,7 +30,7 @@ func (p *fireStorePersistence) GetUser(token login.Token) (login.UserName, error
 	token = login.Token(strings.TrimPrefix(string(token), "Bearer "))
 	get, err := collection.Doc(string(token)).Get(p.ctx)
 	if err != nil {
-		return "", fmt.Errorf("could not get token from persistence: %w", err)
+		return "", fmt.Errorf("could not get token (%s) from persistence: %w", token, err)
 	}
 	var cred login.Credential
 	err = get.DataTo(&cred)
