@@ -20,10 +20,13 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		if postId := strings.TrimSpace(r.FormValue("post")); postId != "" {
+		postId := strings.TrimSpace(r.FormValue("post"))
+		switch {
+		case postId != "":
 			h.getPost(w, postId)
+		default:
+			h.getPosts(w)
 		}
-		h.getPosts(w)
 	case http.MethodPost:
 		h.post(w, r)
 	case http.MethodPut:
