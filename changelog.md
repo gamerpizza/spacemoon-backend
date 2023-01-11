@@ -8,6 +8,9 @@
 * 1 username per person
 
 ---
+##  [v1.3.3] - _2023 01 11_
+### Fixed
+* single post response
 
 ##  [v1.3.2] - _2023 01 11_
 ### Added
