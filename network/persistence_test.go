@@ -1,4 +1,4 @@
-package handler
+package network
 
 import (
 	"errors"
@@ -9,6 +9,11 @@ import (
 )
 
 type failNetworkPersistence struct {
+}
+
+func (f failNetworkPersistence) GetPost(id post.Id) (post.Post, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (f failNetworkPersistence) CheckIfPostExists(id post.Id) (bool, error) {
@@ -61,6 +66,11 @@ func (f failLoginPersistence) Check(name login.UserName) (bool, error) {
 type stubPersistence struct {
 }
 
+func (s stubPersistence) GetPost(id post.Id) (post.Post, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (s stubPersistence) CheckIfPostExists(id post.Id) (bool, error) {
 	//TODO implement me
 	panic("implement me")
@@ -81,6 +91,11 @@ func (s stubPersistence) GetAllPosts() (post.Posts, error) {
 
 type mockNetworkPersistence struct {
 	posts post.Posts
+}
+
+func (m *mockNetworkPersistence) GetPost(id post.Id) (post.Post, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (m *mockNetworkPersistence) CheckIfPostExists(id post.Id) (bool, error) {

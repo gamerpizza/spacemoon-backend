@@ -20,7 +20,7 @@ import (
 
 func main() {
 	log.Default().Print("starting spacemoon/bubblegum server 🚀")
-	log.Default().Print("v1.3.1")
+	log.Default().Print("v1.3.2")
 	setupHandlers()
 	listenAndServe()
 }

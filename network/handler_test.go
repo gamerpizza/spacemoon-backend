@@ -1,4 +1,4 @@
-package handler
+package network
 
 import (
 	"encoding/json"
@@ -12,11 +12,11 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	var _ http.Handler = New(stubPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
+	var _ http.Handler = NewHandler(stubPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
 }
 
 func TestHandler_ServeHTTP_GetShouldBeAllowed(t *testing.T) {
-	h := New(stubPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
+	h := NewHandler(stubPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
 	request := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
 	recorder := httptest.NewRecorder()
 	h.ServeHTTP(recorder, request)
@@ -30,7 +30,7 @@ func TestHandler_ServeHTTP_GetShouldBeAllowed(t *testing.T) {
 }
 
 func TestHandler_ServeHTTP_GetShouldReturnAListOfPosts(t *testing.T) {
-	h := New(stubPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
+	h := NewHandler(stubPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
 	request := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
 	recorder := httptest.NewRecorder()
 	h.ServeHTTP(recorder, request)
@@ -48,7 +48,7 @@ func TestHandler_ServeHTTP_GetShouldReturnAListOfPosts(t *testing.T) {
 }
 
 func TestHandler_ServeHTTP_PostShouldSaveAPost(t *testing.T) {
-	h := New(&mockNetworkPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
+	h := NewHandler(&mockNetworkPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
 	postRequest := httptest.NewRequest(http.MethodPost, "/", http.NoBody)
 	postRequest.Header.Set("Content-Type", "multipart/form-data; boundary=*")
 	form := url.Values{}
@@ -112,7 +112,7 @@ func TestHandler_ServeHTTP_PostShouldSaveAPost(t *testing.T) {
 }
 
 func TestHandler_ServeHTTP_FailsOnPersistenceFail(t *testing.T) {
-	h := New(failNetworkPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
+	h := NewHandler(failNetworkPersistence{}, stubLoginPersistence{}, stubMediaFilePersistence{})
 	request := httptest.NewRequest(http.MethodGet, "/", http.NoBody)
 	recorder := httptest.NewRecorder()
 	h.ServeHTTP(recorder, request)
@@ -122,7 +122,7 @@ func TestHandler_ServeHTTP_FailsOnPersistenceFail(t *testing.T) {
 }
 
 func TestHandler_ServeHTTP_PostFailsOnLoginPersistenceFail(t *testing.T) {
-	h := New(stubPersistence{}, failLoginPersistence{}, stubMediaFilePersistence{})
+	h := NewHandler(stubPersistence{}, failLoginPersistence{}, stubMediaFilePersistence{})
 	request := httptest.NewRequest(http.MethodPost, "/", http.NoBody)
 	recorder := httptest.NewRecorder()
 	h.ServeHTTP(recorder, request)
@@ -143,7 +143,7 @@ func TestHandler_ServeHTTP_Delete(t *testing.T) {
 		log.Fatal(err.Error())
 	}
 
-	h := New(networkPersistence, stubLoginPersistence{}, stubMediaFilePersistence{})
+	h := NewHandler(networkPersistence, stubLoginPersistence{}, stubMediaFilePersistence{})
 	request := httptest.NewRequest(http.MethodDelete, string("/?id="+testPost.GetId()), http.NoBody)
 	recorder := httptest.NewRecorder()
 	h.ServeHTTP(recorder, request)

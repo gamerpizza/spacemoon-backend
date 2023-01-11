@@ -65,6 +65,10 @@ type temporarySocialNetworkPersistence struct {
 	posts post.Posts
 }
 
+func (t *temporarySocialNetworkPersistence) GetPost(id post.Id) (post.Post, error) {
+	return t.posts[id], nil
+}
+
 func (t *temporarySocialNetworkPersistence) CheckIfPostExists(id post.Id) (bool, error) {
 	_, exists := t.posts[id]
 	return exists, nil

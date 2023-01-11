@@ -27,6 +27,7 @@ type Persistence interface {
 	GetAllPosts() (post.Posts, error)
 	DeletePost(post.Id) error
 	CheckIfPostExists(post.Id) (bool, error)
+	GetPost(id post.Id) (post.Post, error)
 }
 
 type postManager struct {
